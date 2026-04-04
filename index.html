@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belly Bears - 777 Legendary Bears</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+    
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body class="bg-[#0f172a] text-white">
+
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-50 bg-[#0f172a]/90 backdrop-blur-md border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <img src="Assets/BellyBearsLogo-Ver.jpeg" class="w-10 h-10 rounded-3xl" alt="Belly Bears">
+                <h1 class="text-2xl font-bold tracking-widest text-[#f39c12]">BELLY BEARS</h1>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden md:flex gap-8 text-lg font-medium">
+                <a href="#mint" class="hover:text-[#f39c12] transition-colors">Mint</a>
+                <a href="#tasks" class="hover:text-[#f39c12] transition-colors">Tasks</a>
+                <a href="#roadmap" class="hover:text-[#f39c12] transition-colors">Roadmap</a>
+                <a href="#team" class="hover:text-[#f39c12] transition-colors">Team</a>
+                <a href="#game" class="hover:text-[#f39c12] transition-colors">Play Game</a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="https://x.com/belly_bears" target="_blank" class="text-3xl hover:scale-110 transition-transform">𝕏</a>
+                <a href="https://t.me/bellybears_bot" target="_blank" 
+                   class="px-5 py-2 bg-[#229ED9] rounded-full font-bold flex items-center gap-2 hover:bg-[#1a8ac4] transition-colors">
+                    <i class="fab fa-telegram"></i> Play Game
+                </a>
+                <button onclick="connectWallet()" 
+                        class="px-6 py-2 bg-[#f39c12] text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
+                    Connect Wallet
+                </button>
+                
+                <!-- Mobile Hamburger -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-3xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-[#0f172a] border-t border-white/10 px-6 py-4">
+            <div class="flex flex-col gap-4 text-lg">
+                <a href="#mint" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Mint</a>
+                <a href="#tasks" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Tasks</a>
+                <a href="#roadmap" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Roadmap</a>
+                <a href="#team" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Team</a>
+                <a href="#game" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Play Game</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-bg min-h-screen flex items-center pt-20">
+        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <h1 class="text-6xl md:text-7xl font-black leading-none tracking-tighter">
+                    777 LEGENDARY<br>
+                    <span class="text-[#f39c12]">BELLY BEARS</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-md">
+                    Chubby, cool, and dangerously cute. Mint your bear, complete tasks, dominate the leaderboard, and join the fattest community on TON.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <a href="https://t.me/bellybears_bot" target="_blank" 
+                       class="px-8 py-4 border-2 border-white/80 text-xl font-bold rounded-2xl hover:bg-white/10 transition-all">
+                        PLAY GAME
+                    </a>
+                    <button onclick="openMintModal()" 
+                            class="px-10 py-5 text-2xl font-bold bg-[#f39c12] text-black rounded-3xl hover:scale-105 transition-all">
+                        MINT YOUR BEAR
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-8 text-sm">
+                    <div>
+                        <span class="text-[#f39c12] font-bold">777</span> TOTAL SUPPLY
+                    </div>
+                    <div class="h-3 w-px bg-white/30"></div>
+                    <div>ON <span class="font-bold">TON</span> BLOCKCHAIN</div>
+                    <div class="h-3 w-px bg-white/30"></div>
+                    <div>WL MINT: <span class="text-[#f39c12]">0.5 TON</span></div>
+                </div>
+            </div>
+            
+            <div class="flex justify-center">
+                <img src="Assets/Main-Bear.png" alt="Main Bear" class="bear-float w-full max-w-[420px] drop-shadow-2xl rounded-3xl">
+            </div>
+        </div>
+    </section>
+
+    <!-- MINT SECTION -->
+    <section id="mint" class="py-24 bg-[#1e2937]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-5xl font-bold mb-6">Mint Your Belly Bear</h2>
+                    <p class="text-xl text-gray-300 mb-8">777 Legendary Bears. Whitelist spots via tasks + game leaderboard. Public mint opens after.</p>
+                    
+                    <div class="bg-[#0f172a] p-8 rounded-3xl mb-8">
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="text-sm font-medium">WHITELIST MINT</div>
+                            <div class="px-4 py-1 bg-[#f39c12] text-black text-sm font-bold rounded-full">0.5 TON</div>
+                        </div>
+                        <div class="h-3 bg-gray-700 rounded-full mb-2 overflow-hidden">
+                            <div class="h-3 bg-[#f39c12] w-3/4 rounded-full"></div>
+                        </div>
+                        <div class="flex justify-between text-xs">
+                            <span>231 / 777 MINTED</span>
+                            <span>46 LEFT FOR WL</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="openMintModal()" 
+                            class="w-full py-6 text-2xl font-bold bg-gradient-to-r from-[#f39c12] to-amber-500 text-black rounded-3xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                        <span>MINT NOW (WHITELIST)</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                    
+                    <p class="text-center text-gray-400 text-sm mt-4">Public mint starts Q3 2026 • Max 3 per wallet</p>
+                </div>
+                
+                <div class="bg-[#0f172a] p-8 rounded-3xl">
+                    <h3 class="font-bold text-xl mb-6 flex items-center gap-3">
+                        <i class="fas fa-fire text-[#f39c12]"></i> 
+                        MINT LIVE STATUS
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Total Bears Minted</span>
+                            <span id="mintedCount" class="font-bold text-3xl text-[#f39c12]">231</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Your Whitelist Status</span>
+                            <span id="wlStatus" class="font-bold text-emerald-400">✅ Eligible</span>
+                        </div>
+                        <div onclick="openMintModal()" class="cursor-pointer text-center py-4 border border-dashed border-[#f39c12] rounded-2xl text-[#f39c12] hover:bg-[#f39c12]/10 transition">
+                            Check your tasks → Claim spot
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TASKS SECTION -->
+    <section id="tasks" class="py-24 bg-[#0f172a]">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-5xl font-bold text-center mb-4">Complete Tasks • Get Whitelist</h2>
+            <p class="text-center text-gray-400 text-xl mb-16">Finish these to unlock early mint + extra rewards in game</p>
+            
+            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto" id="tasksList">
+                <!-- Populated by JS -->
+            </div>
+            
+            <div class="text-center mt-12">
+                <button onclick="openMintModal()" class="px-8 py-4 bg-[#f39c12] text-black font-bold rounded-2xl text-lg">
+                    CONTINUE TO MINT MODAL →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap" class="py-24 bg-[#1e2937]">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-5xl font-bold text-center mb-4">Roadmap</h2>
+            <p class="text-center text-gray-400 text-xl mb-16">Our journey to build the chubbiest empire on TON</p>
+
+            <div class="relative max-w-5xl mx-auto">
+                <div class="hidden md:block absolute left-1/2 top-12 bottom-12 w-1 bg-gradient-to-b from-[#f39c12] to-[#e67e22] timeline-line"></div>
+
+                <div class="space-y-20">
+                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
+                        <div class="md:w-5/12 text-right order-2 md:order-1">
+                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q2 2026</div>
+                            <h3 class="text-3xl font-bold mt-3">Phase 1: The Birth</h3>
+                            <ul class="mt-6 space-y-3 text-gray-300">
+                                <li>🚀 Launch Telegram Mini Game</li>
+                                <li>🐻 Community &amp; Social Growth</li>
+                                <li>📋 Whitelist Task System (Website + Game)</li>
+                                <li>📊 Daily Leaderboard System</li>
+                            </ul>
+                        </div>
+                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">1</div>
+                        <div class="md:w-5/12 order-3"></div>
+                    </div>
+
+                    <div class="roadmap-card flex flex-col md:flex-row-reverse items-center gap-8">
+                        <div class="md:w-5/12"></div>
+                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10">2</div>
+                        <div class="md:w-5/12 text-left">
+                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q3 2026</div>
+                            <h3 class="text-3xl font-bold mt-3">Phase 2: Minting Era</h3>
+                            <ul class="mt-6 space-y-3 text-gray-300">
+                                <li>🔥 777 NFT Collection Launch</li>
+                                <li>🎟️ Whitelist Claim (Game + Website Tasks)</li>
+                                <li>🌐 Public Mint</li>
+                                <li>📈 Dashboard + Leaderboard Live</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
+                        <div class="md:w-5/12 text-right order-2 md:order-1">
+                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q4 2026</div>
+                            <h3 class="text-3xl font-bold mt-3">Phase 3: Utility &amp; Rewards</h3>
+                            <ul class="mt-6 space-y-3 text-gray-300">
+                                <li>💰 Staking &amp; Passive Income</li>
+                                <li>🎮 In-game Rewards &amp; Airdrop</li>
+                                <li>🛍️ Official Merch Drop</li>
+                                <li>🏆 Holder-only Events</li>
+                            </ul>
+                        </div>
+                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">3</div>
+                        <div class="md:w-5/12 order-3"></div>
+                    </div>
+
+                    <div class="roadmap-card flex flex-col md:flex-row-reverse items-center gap-8">
+                        <div class="md:w-5/12"></div>
+                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10">4</div>
+                        <div class="md:w-5/12 text-left">
+                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q1 2027</div>
+                            <h3 class="text-3xl font-bold mt-3">Phase 4: Expansion</h3>
+                            <ul class="mt-6 space-y-3 text-gray-300">
+                                <li>📈 CEX Listing</li>
+                                <li>🤝 Strategic Partnerships</li>
+                                <li>🌌 Metaverse Integration</li>
+                                <li>🪙 $BELLY Token Launch</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
+                        <div class="md:w-5/12 text-right order-2 md:order-1">
+                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">2027+</div>
+                            <h3 class="text-3xl font-bold mt-3">Phase 5: Legacy</h3>
+                            <ul class="mt-6 space-y-3 text-gray-300">
+                                <li>🌍 Real-world Events &amp; Meetups</li>
+                                <li>🖼️ NFT Utility Expansion</li>
+                                <li>🌐 Global Community Growth</li>
+                                <li>🦸 Belly Bears Universe (Comic, Animation, etc)</li>
+                            </ul>
+                        </div>
+                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">5</div>
+                        <div class="md:w-5/12 order-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GAME SECTION -->
+    <section id="game" class="py-24 bg-[#1e2937]">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-12 gap-12 items-center">
+                <div class="md:col-span-7">
+                    <h2 class="text-5xl font-bold mb-6">Play • Earn • Dominate</h2>
+                    <p class="text-xl text-gray-300 mb-10">Our Telegram Mini Game is LIVE! Feed your bear, battle other chubbies, climb daily leaderboard and earn whitelist spots + $BELLY rewards.</p>
+                    
+                    <div class="flex gap-6">
+                        <a href="https://t.me/bellybears_bot" target="_blank" 
+                           class="flex-1 bg-[#229ED9] hover:bg-[#1a8ac4] py-8 px-10 rounded-3xl flex flex-col items-center text-center transition-colors">
+                            <i class="fab fa-telegram text-6xl mb-4"></i>
+                            <h4 class="text-2xl font-bold">OPEN IN TELEGRAM</h4>
+                            <p class="text-sm mt-2">Instant play • No download</p>
+                        </a>
+                        
+                        <div class="flex-1 bg-[#0f172a] py-8 px-10 rounded-3xl text-center">
+                            <h4 class="text-2xl font-bold mb-6">TODAY'S TOP 3</h4>
+                            <div id="leaderboardDemo" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="md:col-span-5">
+                    <div class="bg-black/40 rounded-3xl p-4">
+                        <img src="https://i.ibb.co/0jKzKzK/1.png" alt="Game Screenshot" class="rounded-2xl w-full shadow-2xl">
+                        <p class="text-center text-xs text-gray-400 mt-4">Screenshot from Belly Bears Mini Game</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team" class="py-24 bg-[#0f172a]">
+        <div class="max-w-6xl mx-auto px-6">
+            <h2 class="text-5xl font-bold text-center mb-16">Team Belly Bears</h2>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center group">
+                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">🐻</div>
+                    <h4 class="font-bold text-xl">Chubby Founder</h4>
+                    <p class="text-gray-400">Visionary &amp; Community Leader</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-pink-400 to-purple-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">🎨</div>
+                    <h4 class="font-bold text-xl">Pixel Bear</h4>
+                    <p class="text-gray-400">Lead Artist &amp; Designer</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-cyan-400 to-blue-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">📱</div>
+                    <h4 class="font-bold text-xl">Game Dev Bear</h4>
+                    <p class="text-gray-400">Telegram Mini Game Developer</p>
+                </div>
+                <div class="text-center group">
+                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">📈</div>
+                    <h4 class="font-bold text-xl">Marketing Bear</h4>
+                    <p class="text-gray-400">Growth &amp; Community Manager</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-24 bg-[#1e2937]">
+        <div class="max-w-4xl mx-auto px-6">
+            <h2 class="text-5xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            <div class="space-y-6">
+                <details class="bg-[#0f172a] p-6 rounded-3xl group">
+                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
+                        How to get Whitelist?
+                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+                    </summary>
+                    <p class="mt-4 text-gray-300">Complete tasks on this website + play the game and climb the daily leaderboard. Top players get guaranteed WL.</p>
+                </details>
+                <details class="bg-[#0f172a] p-6 rounded-3xl group">
+                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
+                        When is the Mint?
+                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+                    </summary>
+                    <p class="mt-4 text-gray-300">Whitelist mint in Q3 2026. Public mint follows shortly after. Exact date announced in Telegram.</p>
+                </details>
+                <details class="bg-[#0f172a] p-6 rounded-3xl group">
+                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
+                        How to contact the team?
+                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+                    </summary>
+                    <p class="mt-4 text-gray-300">Join our Telegram Community: <a href="https://t.me/bellybears_bot" class="text-[#f39c12] underline">t.me/bellybears_bot</a></p>
+                </details>
+                <details class="bg-[#0f172a] p-6 rounded-3xl group">
+                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
+                        Is this on TON?
+                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
+                    </summary>
+                    <p class="mt-4 text-gray-300">Yes! All NFTs and the game run on The Open Network (TON) for super fast &amp; cheap transactions.</p>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black py-16 text-center">
+        <p class="text-2xl font-bold text-[#f39c12]">BELLY BEARS</p>
+        <p class="text-gray-500 mt-2">777 Legendary Chubby Bears on TON</p>
+        <div class="flex justify-center gap-8 mt-10 text-4xl">
+            <a href="https://x.com/belly_bears" target="_blank" class="hover:text-[#f39c12] transition">𝕏</a>
+            <a href="https://t.me/bellybears_bot" target="_blank" class="hover:text-[#229ED9] transition">📱</a>
+        </div>
+        <p class="text-xs text-gray-600 mt-12">© 2026 Belly Bears. All rights reserved.</p>
+    </footer>
+
+    <!-- MINTING MODAL -->
+    <div id="mintModal" onclick="if(event.target.id === 'mintModal') closeMintModal()" 
+         class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] px-4">
+        <div onclick="event.stopImmediatePropagation()" 
+             class="modal bg-[#1a1428] w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-[#f39c12]/30 shadow-2xl">
+            
+            <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center">
+                <div class="flex gap-2">
+                    <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
+                    <div class="w-3 h-3 rounded-full bg-purple-400"></div>
+                </div>
+                <h2 class="text-xl font-bold">MINT YOUR BELLY BEAR</h2>
+                <button onclick="closeMintModal()" class="text-4xl text-gray-400 hover:text-white leading-none">×</button>
+            </div>
+
+            <div class="p-8">
+                <!-- Progress Steps -->
+                <div class="flex justify-between mb-8 px-4">
+                    <div onclick="goToStep(1)" id="step1" class="cursor-pointer w-9 h-9 rounded-2xl bg-[#f39c12] text-black flex items-center justify-center font-bold text-lg shadow-inner">1</div>
+                    <div onclick="goToStep(2)" id="step2" class="cursor-pointer w-9 h-9 rounded-2xl bg-gray-700 flex items-center justify-center font-bold text-lg">2</div>
+                    <div onclick="goToStep(3)" id="step3" class="cursor-pointer w-9 h-9 rounded-2xl bg-gray-700 flex items-center justify-center font-bold text-lg">3</div>
+                </div>
+
+                <!-- Step 1: Tasks + Game WL -->
+                <div id="stepContent1">
+                    <h3 class="text-2xl font-bold text-center mb-6">Step 1: Get Whitelist</h3>
+                    <div id="modalTasksList" class="space-y-4 mb-8"></div>
+
+                    <!-- GAME WL BOX -->
+                    <div class="bg-[#2a2140] p-6 rounded-3xl mb-8">
+                        <div class="flex justify-between items-center">
+                            <div class="font-bold flex items-center gap-2">
+                                <i class="fas fa-gamepad text-emerald-400"></i>
+                                🎮 Game Leaderboard WL
+                            </div>
+                            <button onclick="claimGameWL()" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl font-bold">Claim Guaranteed WL</button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2">Reach Top 100 in game → Get automatic WL here</p>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-sm mb-2 font-medium">Telegram Username (wajib)</label>
+                        <input id="tgUsername" type="text" placeholder="@yourusername" 
+                               class="w-full bg-[#2a2140] px-6 py-4 rounded-3xl outline-none text-white">
+                    </div>
+
+                    <button onclick="submitTasksAndContinue()" 
+                            class="mt-8 w-full py-5 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-xl rounded-3xl flex items-center justify-center gap-3">
+                        SAVE &amp; CONTINUE TO WALLET <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Step 2: Connect Wallet -->
+                <div id="stepContent2" class="hidden">
+                    <h3 class="text-2xl font-bold text-center mb-6">Step 2: Connect TON Wallet</h3>
+                    <div class="bg-[#2a2140] p-8 rounded-3xl text-center mb-8">
+                        <i class="fas fa-wallet text-6xl mb-6 text-[#f39c12]"></i>
+                        <p class="text-lg mb-6">Connect your TON wallet (Tonkeeper, MyTonWallet, etc)</p>
+                        <button onclick="connectWalletInModal()" 
+                                class="w-full py-5 bg-white text-black font-bold rounded-3xl hover:bg-amber-300">
+                            CONNECT WALLET
+                        </button>
+                        <p id="walletAddressDisplay" class="text-xs text-emerald-400 mt-4 font-mono"></p>
+                    </div>
+                    <button onclick="nextStep()" class="w-full py-5 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-xl rounded-3xl">NEXT →</button>
+                </div>
+
+                <!-- Step 3: Mint -->
+                <div id="stepContent3" class="hidden">
+                    <h3 class="text-2xl font-bold text-center mb-6">Step 3: Mint Your Bear</h3>
+                    <div class="text-center py-8">
+                        <div id="mintPreview" class="mx-auto w-40 h-40 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center text-8xl mb-8">🐻</div>
+                        <p class="text-2xl font-bold mb-2">Ready to mint?</p>
+                        <p class="text-gray-400">Cost: <span class="text-[#f39c12]">0.5 TON</span></p>
+                    </div>
+                    <button onclick="performMint()" 
+                            class="w-full py-5 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-2xl rounded-3xl hover:scale-105 transition">
+                        MINT BEAR #<span id="randomBearNumber">442</span>
+                    </button>
+                    <p class="text-xs text-center text-gray-400 mt-6">You will receive your NFT instantly on TON</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================== GOOGLE SHEET CONFIG ==================
+        // GANTI DENGAN URL GOOGLE APPS SCRIPT KAMU
+        const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec";
+
+        // Tailwind config
+        tailwind.config = {
+            content: ["./**/*.{html,js}"],
+            theme: { extend: {} }
+        };
+
+        // LocalStorage key
+        const TASKS_KEY = 'bellyBearsTasks';
+
+        // Tasks (with game WL special task)
+        let tasks = [
+            { id: 1, title: "Follow @belly_bears on X", link: "https://x.com/belly_bears", completed: false },
+            { id: 2, title: "Join Telegram Community", link: "https://t.me/bellybears_bot", completed: false },
+            { id: 3, title: "Share your bear on X (tag @belly_bears)", link: "https://x.com/belly_bears", completed: false },
+            { id: 4, title: "Play Game & Reach Top 100 Daily", gameTask: true, completed: false }
+        ];
+
+        function loadTasks() {
+            const saved = localStorage.getItem(TASKS_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                tasks = tasks.map(task => {
+                    const savedTask = parsed.find(t => t.id === task.id);
+                    return savedTask ? { ...task, completed: savedTask.completed } : task;
+                });
+            }
+            saveTasks();
+        }
+
+        function saveTasks() {
+            localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+        }
+
+        // Render tasks in main Tasks section
+        function renderTasksSection() {
+            const container = document.getElementById('tasksList');
+            container.innerHTML = '';
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `flex items-center justify-between p-6 rounded-3xl transition-all ${task.completed ? 'bg-emerald-900/30 task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        ${task.completed ? 
+                            `<i class="fas fa-check-circle text-emerald-400 text-2xl"></i>` : 
+                            `<i class="fas fa-circle text-gray-400 text-2xl"></i>`
+                        }
+                        <div>
+                            <p class="${task.completed ? 'line-through text-gray-400' : ''}">${task.title}</p>
+                        </div>
+                    </div>
+                    <div>
+                        ${task.completed ? 
+                            `<span class="px-5 py-2 text-xs font-bold bg-emerald-400 text-black rounded-2xl">DONE</span>` : 
+                            task.gameTask ? 
+                            `<button onclick="claimGameWL(); event.stopImmediatePropagation()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 font-semibold rounded-2xl text-sm transition-colors">VERIFY GAME WL</button>` :
+                            `<a href="${task.link}" target="_blank" onclick="markTask(${task.id}); event.stopImmediatePropagation()" class="px-8 py-3 bg-white/10 hover:bg-[#f39c12] hover:text-black font-semibold rounded-2xl text-sm transition-colors">DO TASK</a>`
+                        }
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            const completedCount = tasks.filter(t => t.completed).length;
+            if (completedCount >= 3) {
+                const el = document.createElement('div');
+                el.className = "col-span-2 text-center mt-4 p-4 bg-emerald-900/30 rounded-3xl text-emerald-400 font-bold";
+                el.innerHTML = `🎉 You have enough tasks for whitelist! Open Mint Modal →`;
+                container.appendChild(el);
+            }
+        }
+
+        // Render tasks inside modal
+        function renderModalTasks() {
+            const container = document.getElementById('modalTasksList');
+            container.innerHTML = '';
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = `bg-[#2a2140] p-5 rounded-2xl flex justify-between items-center ${task.completed ? 'task-completed' : ''}`;
+                div.innerHTML = `
+                    <div class="flex-1">${task.title}</div>
+                    <div>
+                        ${task.completed ? 
+                            `<i onclick="unmarkTask(${task.id}); event.stopImmediatePropagation()" class="fas fa-check-circle text-emerald-400 text-3xl cursor-pointer"></i>` : 
+                            task.gameTask ? 
+                            `<button onclick="claimGameWL(); event.stopImmediatePropagation()" class="px-7 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-2xl text-sm font-bold">VERIFY GAME</button>` :
+                            `<button onclick="markTask(${task.id}); event.stopImmediatePropagation()" class="px-7 py-2 bg-cyan-500 hover:bg-cyan-400 rounded-2xl text-sm font-bold transition">MARK DONE</button>`
+                        }
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function markTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = true;
+                saveTasks();
+                renderTasksSection();
+                renderModalTasks();
+                if (tasks.filter(t => t.completed).length >= 3) {
+                    document.getElementById('wlStatus').innerHTML = `✅ ELIGIBLE <span class="text-xs">(3/4 tasks)</span>`;
+                }
+            }
+        }
+
+        function unmarkTask(id) {
+            const task = tasks.find(t => t.id === id);
+            if (task) {
+                task.completed = false;
+                saveTasks();
+                renderTasksSection();
+                renderModalTasks();
+            }
+        }
+
+        // Claim Guaranteed WL from Game
+        function claimGameWL() {
+            const gameTask = tasks.find(t => t.gameTask === true);
+            if (gameTask) {
+                gameTask.completed = true;
+                saveTasks();
+                renderTasksSection();
+                renderModalTasks();
+                alert("🎉 Congratulations! You received Guaranteed WL from the game leaderboard!\n\nYour spot is secured.");
+            }
+        }
+
+        // Submit to Google Sheet
+        async function submitToGoogleSheet(username) {
+            const completedTasks = tasks.filter(t => t.completed).map(t => t.title).join(" | ");
+            const payload = {
+                timestamp: new Date().toISOString(),
+                telegram: username,
+                tasks: completedTasks,
+                game_wl: tasks.some(t => t.gameTask && t.completed) ? "YES" : "NO",
+                total_completed: tasks.filter(t => t.completed).length
+            };
+
+            try {
+                await fetch(SHEET_WEB_APP_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "application/json" }
+                });
+                console.log("✅ Data WL berhasil dikirim ke Google Sheet");
+            } catch (e) {
+                console.log("⚠️ Gagal mengirim ke sheet (demo mode)");
+            }
+        }
+
+        // Modal logic
+        let currentStep = 1;
+        let walletConnected = false;
+
+        function openMintModal() {
+            document.getElementById('mintModal').classList.remove('hidden');
+            currentStep = 1;
+            walletConnected = false;
+            document.getElementById('walletAddressDisplay').textContent = '';
+            showStep();
+            renderModalTasks();
+        }
+
+        function closeMintModal() {
+            document.getElementById('mintModal').classList.add('hidden');
+        }
+
+        function showStep() {
+            document.getElementById('stepContent1').classList.add('hidden');
+            document.getElementById('stepContent2').classList.add('hidden');
+            document.getElementById('stepContent3').classList.add('hidden');
+            document.getElementById(`stepContent${currentStep}`).classList.remove('hidden');
+
+            for (let i = 1; i <= 3; i++) {
+                const pill = document.getElementById(`step${i}`);
+                if (i < currentStep) {
+                    pill.classList.add('bg-emerald-400', 'text-black');
+                    pill.classList.remove('bg-gray-700');
+                } else if (i === currentStep) {
+                    pill.classList.add('bg-[#f39c12]', 'text-black');
+                    pill.classList.remove('bg-gray-700');
+                } else {
+                    pill.classList.remove('bg-emerald-400', 'bg-[#f39c12]', 'text-black');
+                    pill.classList.add('bg-gray-700');
+                }
+            }
+        }
+
+        function goToStep(step) {
+            if (step <= currentStep || (step === 2 && walletConnected) || (step === 3 && walletConnected)) {
+                currentStep = step;
+                showStep();
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                const done = tasks.filter(t => t.completed).length;
+                if (done < 2) {
+                    alert("⚠️ Complete at least 2 tasks or claim Game WL first!");
+                    return;
+                }
+            }
+            currentStep++;
+            showStep();
+        }
+
+        function submitTasksAndContinue() {
+            const username = document.getElementById('tgUsername').value.trim();
+            if (!username || !username.startsWith('@')) {
+                alert("Masukkan Telegram username kamu (@username)");
+                return;
+            }
+            submitToGoogleSheet(username);
+            nextStep();
+        }
+
+        function connectWalletInModal() {
+            walletConnected = true;
+            const fakeAddress = "EQ...b3a9f2k8x9p" + Math.floor(Math.random() * 9999);
+            document.getElementById('walletAddressDisplay').innerHTML = `
+                ✅ Connected<br>
+                <span class="font-mono text-xs">${fakeAddress}</span>
+            `;
+            setTimeout(() => {
+                if (currentStep === 2) nextStep();
+            }, 800);
+        }
+
+        function connectWallet() {
+            alert("🔗 TON Wallet connected!\n\n(Demo - In real project this would open Tonkeeper / MyTonWallet)");
+            walletConnected = true;
+        }
+
+        function performMint() {
+            const number = Math.floor(Math.random() * 777) + 1;
+            document.getElementById('randomBearNumber').textContent = number;
+            const btn = event.currentTarget;
+            btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-3"></i> MINTING ON TON...`;
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert(`🎉 CONGRATULATIONS!\n\nYou minted Belly Bear #${number}!\n\nNFT sent to your wallet.`);
+                closeMintModal();
+                btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
+                btn.disabled = false;
+                let count = parseInt(document.getElementById('mintedCount').textContent) || 231;
+                document.getElementById('mintedCount').textContent = count + 1;
+            }, 2200);
+        }
+
+        // Fake leaderboard
+        function renderFakeLeaderboard() {
+            const container = document.getElementById('leaderboardDemo');
+            const players = [
+                { name: "ChubbyKing88", score: "12480" },
+                { name: "BellyBoss", score: "11390" },
+                { name: "FluffyTon", score: "10920" }
+            ];
+            container.innerHTML = players.map((p, i) => `
+                <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[#f39c12] font-bold">#${i+1}</span>
+                        <span>${p.name}</span>
+                    </div>
+                    <span class="font-mono">${p.score} pts</span>
+                </div>
+            `).join('');
+        }
+
+        // Animate roadmap
+        function animateRoadmap() {
+            const cards = document.querySelectorAll('.roadmap-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.3 });
+            cards.forEach(card => observer.observe(card));
+        }
+
+        // Mobile menu
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Initialize everything
+        window.onload = () => {
+            loadTasks();
+            renderTasksSection();
+            renderFakeLeaderboard();
+            animateRoadmap();
+            
+            // Fake live minted count
+            setInterval(() => {
+                let countEl = document.getElementById('mintedCount');
+                let count = parseInt(countEl.textContent);
+                if (count < 300) {
+                    countEl.textContent = count + Math.floor(Math.random() * 3) + 1;
+                }
+            }, 8000);
+            
+            console.log('%c✅ Belly Bears FULL WEBSITE READY! (Task + Game WL + Google Sheet)', 'color:#f39c12; font-size:15px; font-weight:bold');
+        };
+    </script>
+</body>
+</html>
