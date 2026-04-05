@@ -1,51 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
-        
-body { font-family: 'Inter', system-ui, sans-serif; }
-.hero-bg { background: linear-gradient(135deg, #1e2937, #334155); }
-.bear-float { animation: float 3s ease-in-out infinite; }
-@keyframes float { 
-    0%, 100% { transform: translateY(0); } 
-    50% { transform: translateY(-20px); } 
+/* ===============================================
+   Belly Bears - Custom CSS
+   =============================================== */
+
+/* Hero Background */
+.hero-bg {
+    background: linear-gradient(180deg, #0f172a 0%, #1e2937 100%);
+    position: relative;
+    overflow: hidden;
 }
 
-.modal { animation: modalPop 0.3s ease; }
-@keyframes modalPop { 
-    from { opacity: 0; transform: scale(0.95); } 
-    to { opacity: 1; transform: scale(1); } 
+.hero-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 20%, rgba(243, 156, 18, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
 }
-        
+
+/* Bear floating animation */
+.bear-float {
+    animation: bearFloat 4s ease-in-out infinite;
+    transition: transform 0.4s ease;
+}
+
+@keyframes bearFloat {
+    0%, 100% { 
+        transform: translateY(0px) rotate(-2deg); 
+    }
+    50% { 
+        transform: translateY(-35px) rotate(2deg); 
+    }
+}
+
+/* Timeline line for Roadmap */
+.timeline-line {
+    background: linear-gradient(to bottom, #f39c12, #e67e22);
+    box-shadow: 0 0 15px rgba(243, 156, 18, 0.5);
+}
+
+/* Roadmap card animation */
 .roadmap-card {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
+
 .roadmap-card.visible {
     opacity: 1;
     transform: translateY(0);
 }
-.timeline-line {
-    animation: drawLine 2s ease forwards;
-}
-@keyframes drawLine {
-    from { height: 0; }
-    to { height: 100%; }
-}
 
+/* Task completed style */
 .task-completed {
-    opacity: 0.7;
-    text-decoration: line-through;
+    border: 2px solid #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.08) !important;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
+/* Leaderboard row hover effect */
 .leaderboard-row {
-    animation: fadeInUp 0.5s ease forwards;
+    transition: all 0.3s ease;
 }
-@keyframes fadeInUp {
-    from {
+
+.leaderboard-row:hover {
+    transform: translateX(10px) scale(1.02);
+    background-color: #f39c12 !important;
+    color: #0f172a;
+    box-shadow: 0 10px 15px rgba(243, 156, 18, 0.3);
+}
+
+/* Modal pop-in animation */
+.modal {
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes modalPop {
+    0% {
+        transform: scale(0.8) translateY(50px);
         opacity: 0;
-        transform: translateY(20px);
     }
-    to {
+    100% {
+        transform: scale(1) translateY(0);
         opacity: 1;
-        transform: translateY(0);
     }
+}
+
+/* Button hover effects */
+button, a {
+    transition: all 0.3s ease;
+}
+
+button:hover, 
+a:hover {
+    transform: translateY(-2px);
+}
+
+/* Progress bar in mint section */
+.bg-gray-700 {
+    background-color: #334155;
+}
+
+/* Mobile menu smooth transition */
+#mobileMenu {
+    transition: all 0.4s ease;
+}
+
+/* FAQ details summary arrow */
+details summary::-webkit-details-marker {
+    display: none;
+}
+
+/* Extra glow for orange accents */
+.text-[#f39c12], .bg-[#f39c12] {
+    text-shadow: 0 0 10px rgba(243, 156, 18, 0.6);
+}
+
+/* Smooth scroll behavior */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar (optional, looks premium) */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: #1e2937;
+}
+::-webkit-scrollbar-thumb {
+    background: #f39c12;
+    border-radius: 20px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #e67e22;
 }
