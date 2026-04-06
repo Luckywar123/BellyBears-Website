@@ -1,11 +1,78 @@
 // ================== GOOGLE SHEET CONFIG ==================
-// GANTI DENGAN URL GOOGLE APPS SCRIPT KAMU
-const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/YOUR_WEB_APP_ID/exec";
+const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoLijBi7RfKLlqzgJrim1cV0VrSUJ9Pk_w8sjcBt-IBX-sgeLa4uHcEDaKhBUE-SEi/exec";
 
-// LocalStorage key
+// ================== SUPABASE CONFIG ==================
+// GANTI DENGAN DATA KAMU DARI SUPABASE DASHBOARD
+const SUPABASE_URL = 'https://tfdxmqvkkiidujrunfcp.supabase.co';     // ← Project URL kamu
+const SUPABASE_ANON_KEY = 'sb_publishable_5b1Rg4Owdcr_L18qvWwQ3A_exEiIKt3';                         // ← Anon Public Key kamu
+
+let supabaseClient;
+
+// Inisialisasi Supabase
+function initSupabase() {
+    supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+// Fetch Top 3 dari database
+async function fetchLeaderboard() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('highscores')
+            .select('username, best_score')
+            .order('best_score', { ascending: false })
+            .limit(3);
+
+        if (error) throw error;
+        return data || [];
+    } catch (err) {
+        console.error('❌ Error fetch leaderboard:', err);
+        return []; // fallback ke fake data
+    }
+}
+
+// Render leaderboard (real atau fake)
+function renderLeaderboard(players) {
+    const container = document.getElementById('leaderboardDemo');
+    
+    // Kalau kosong, pakai fake data
+    if (!players || players.length === 0) {
+        renderFakeLeaderboard();
+        return;
+    }
+
+    container.innerHTML = players.map((p, i) => `
+        <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
+            <div class="flex items-center gap-3">
+                <span class="text-[#f39c12] font-bold">#${i+1}</span>
+                <span>${p.username || 'Anonymous'}</span>
+            </div>
+            <span class="font-mono">${p.best_score || 0} pts</span>
+        </div>
+    `).join('');
+}
+
+// Fake leaderboard (fallback)
+function renderFakeLeaderboard() {
+    const container = document.getElementById('leaderboardDemo');
+    const players = [
+        { username: "ChubbyKing88", best_score: 12480 },
+        { username: "BellyBoss", best_score: 11390 },
+        { username: "FluffyTon", best_score: 10920 }
+    ];
+    container.innerHTML = players.map((p, i) => `
+        <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
+            <div class="flex items-center gap-3">
+                <span class="text-[#f39c12] font-bold">#${i+1}</span>
+                <span>${p.username}</span>
+            </div>
+            <span class="font-mono">${p.best_score} pts</span>
+        </div>
+    `).join('');
+}
+
+// ================== TASKS & MODAL (Kode lama kamu tetap utuh) ==================
 const TASKS_KEY = 'bellyBearsTasks';
 
-// Tasks (with game WL special task)
 let tasks = [
     { id: 1, title: "Follow @belly_bears on X", link: "https://x.com/belly_bears", completed: false },
     { id: 2, title: "Join Telegram Community", link: "https://t.me/bellybears_bot", completed: false },
@@ -29,7 +96,6 @@ function saveTasks() {
     localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
 }
 
-// Render tasks in main Tasks section
 function renderTasksSection() {
     const container = document.getElementById('tasksList');
     container.innerHTML = '';
@@ -67,7 +133,6 @@ function renderTasksSection() {
     }
 }
 
-// Render tasks inside modal
 function renderModalTasks() {
     const container = document.getElementById('modalTasksList');
     container.innerHTML = '';
@@ -112,7 +177,6 @@ function unmarkTask(id) {
     }
 }
 
-// Claim Guaranteed WL from Game
 function claimGameWL() {
     const gameTask = tasks.find(t => t.gameTask === true);
     if (gameTask) {
@@ -124,7 +188,6 @@ function claimGameWL() {
     }
 }
 
-// Submit to Google Sheet
 async function submitToGoogleSheet(username) {
     const completedTasks = tasks.filter(t => t.completed).map(t => t.title).join(" | ");
     const payload = {
@@ -248,25 +311,6 @@ function performMint() {
     }, 2200);
 }
 
-// Fake leaderboard
-function renderFakeLeaderboard() {
-    const container = document.getElementById('leaderboardDemo');
-    const players = [
-        { name: "ChubbyKing88", score: "12480" },
-        { name: "BellyBoss", score: "11390" },
-        { name: "FluffyTon", score: "10920" }
-    ];
-    container.innerHTML = players.map((p, i) => `
-        <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
-            <div class="flex items-center gap-3">
-                <span class="text-[#f39c12] font-bold">#${i+1}</span>
-                <span>${p.name}</span>
-            </div>
-            <span class="font-mono">${p.score} pts</span>
-        </div>
-    `).join('');
-}
-
 // Animate roadmap
 function animateRoadmap() {
     const cards = document.querySelectorAll('.roadmap-card');
@@ -286,13 +330,17 @@ function toggleMobileMenu() {
     menu.classList.toggle('hidden');
 }
 
-// Initialize everything
-window.onload = () => {
+// ================== INITIALIZE SEMUA ==================
+window.onload = async () => {
     loadTasks();
     renderTasksSection();
-    renderFakeLeaderboard();
     animateRoadmap();
-    
+
+    // Inisialisasi Supabase + fetch leaderboard
+    initSupabase();
+    const leaderboardData = await fetchLeaderboard();
+    renderLeaderboard(leaderboardData);
+
     // Fake live minted count
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');
@@ -301,6 +349,6 @@ window.onload = () => {
             countEl.textContent = count + Math.floor(Math.random() * 3) + 1;
         }
     }, 8000);
-    
-    console.log('%c✅ Belly Bears FULL WEBSITE READY! (Task + Game WL + Google Sheet)', 'color:#f39c12; font-size:15px; font-weight:bold');
+
+    console.log('%c✅ Belly Bears WEBSITE READY with Supabase Leaderboard!', 'color:#f39c12; font-size:15px; font-weight:bold');
 };
