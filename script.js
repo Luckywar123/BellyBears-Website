@@ -149,38 +149,46 @@ function saveTasks() {
 function renderTasksSection() {
     const container = document.getElementById('tasksList');
     container.innerHTML = '';
-    tasks.forEach(task => {
+    
+    tasks.forEach((task, index) => {
         const div = document.createElement('div');
-        div.className = `task-card flex items-center justify-between p-6 rounded-3xl transition-all ${task.completed ? 'bg-emerald-900/30 task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
+        div.className = `task-card group flex items-center justify-between p-6 rounded-3xl transition-all duration-500 ${task.completed ? 'task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
+        
         div.innerHTML = `
-            <div class="flex items-center gap-4">
-                ${task.completed ? 
-                    `<i class="fas fa-check-circle text-emerald-400 text-2xl"></i>` : 
-                    `<i class="fas fa-circle text-gray-400 text-2xl"></i>`
+            <div class="flex items-center gap-4 flex-1">
+                <!-- Circle Indicator -->
+                ${task.completed 
+                    ? `<div class="w-9 h-9 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-xl shadow-inner">✅</div>` 
+                    : `<div class="w-9 h-9 border-2 border-gray-400 group-hover:border-[#f39c12] rounded-2xl flex items-center justify-center transition-colors"></div>`
                 }
-                <div>
-                    <p class="${task.completed ? 'line-through text-gray-400' : ''}">${task.title}</p>
+                
+                <div class="flex-1">
+                    <p class="${task.completed ? 'line-through text-gray-400' : 'text-white'} text-lg font-medium">
+                        ${task.title}
+                    </p>
                 </div>
             </div>
+            
             <div>
-                ${task.completed ? 
-                    `<span class="px-5 py-2 text-xs font-bold bg-emerald-400 text-black rounded-2xl">DONE</span>` : 
-                    task.gameTask ? 
-                    `<button onclick="claimGameWL(); event.stopImmediatePropagation()" class="px-8 py-3 bg-emerald-500 hover:bg-emerald-600 font-semibold rounded-2xl text-sm transition-colors">VERIFY GAME WL</button>` :
-                    `<a href="${task.link}" target="_blank" onclick="markTask(${task.id}); event.stopImmediatePropagation()" class="px-8 py-3 bg-white/10 hover:bg-[#f39c12] hover:text-black font-semibold rounded-2xl text-sm transition-colors">DO TASK</a>`
+                ${task.completed 
+                    ? `<span class="px-6 py-3 bg-emerald-400 text-black text-sm font-bold rounded-2xl">DONE</span>`
+                    : task.gameTask 
+                        ? `<button onclick="claimGameWL(); event.stopImmediatePropagation()" 
+                                   class="px-8 py-3 bg-[#10b981] hover:bg-emerald-400 font-bold rounded-2xl text-sm transition-all">
+                            VERIFY GAME WL
+                           </button>`
+                        : `<a href="${task.link}" target="_blank" onclick="markTask(${task.id}); event.stopImmediatePropagation()" 
+                             class="px-8 py-3 bg-white/10 hover:bg-[#f39c12] hover:text-black font-semibold rounded-2xl text-sm transition-all">
+                            DO TASK
+                           </a>`
                 }
             </div>
         `;
         container.appendChild(div);
     });
 
-    const completedCount = tasks.filter(t => t.completed).length;
-    if (completedCount >= 3) {
-        const el = document.createElement('div');
-        el.className = "col-span-2 text-center mt-4 p-4 bg-emerald-900/30 rounded-3xl text-emerald-400 font-bold";
-        el.innerHTML = `🎉 You have enough tasks for whitelist! Open Mint Modal →`;
-        container.appendChild(el);
-    }
+    // Update Progress Ring
+    updateTaskProgress();
 }
 
 function renderModalTasks() {

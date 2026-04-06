@@ -151,18 +151,34 @@
         </div>
     </section>
 
-    <!-- TASKS SECTION -->
+    <!-- TASKS SECTION - RAPI + ANIMASI KECE -->
     <section id="tasks" class="py-24 bg-[#0f172a]">
         <div class="max-w-6xl mx-auto px-6">
             <h2 class="text-5xl font-bold text-center mb-4">Complete Tasks • Get Whitelist</h2>
             <p class="text-center text-gray-400 text-xl mb-16">Finish these to unlock early mint + extra rewards in game</p>
             
+            <!-- Progress Ring -->
+            <div class="flex justify-center mb-12">
+                <div id="taskProgress" class="relative w-28 h-28 flex items-center justify-center">
+                    <svg class="w-28 h-28 -rotate-12" viewBox="0 0 42 42">
+                        <circle cx="21" cy="21" r="15" fill="none" stroke="#334155" stroke-width="6"/>
+                        <circle id="progressCircle" cx="21" cy="21" r="15" fill="none" 
+                                stroke="#f39c12" stroke-width="6" stroke-dasharray="94.2" 
+                                stroke-dashoffset="94.2" stroke-linecap="round"/>
+                    </svg>
+                    <div class="absolute text-center">
+                        <span id="progressText" class="text-4xl font-bold text-[#f39c12]">0/4</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto" id="tasksList">
-                <!-- Populated by JS -->
+                <!-- Akan diisi oleh JavaScript -->
             </div>
             
             <div class="text-center mt-12">
-                <button onclick="openMintModal()" class="px-8 py-4 bg-[#f39c12] text-black font-bold rounded-2xl text-lg">
+                <button onclick="openMintModal()" 
+                        class="mint-pulse px-10 py-5 text-xl font-bold bg-gradient-to-r from-[#f39c12] to-amber-500 text-black rounded-3xl hover:scale-105 transition-all inline-flex items-center gap-3">
                     CONTINUE TO MINT MODAL →
                 </button>
             </div>
