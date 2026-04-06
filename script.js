@@ -8,8 +8,24 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let supabaseClient;
 let userWalletAddress = null;
+let currentStep = 1;
+let walletConnected = false;
 
 
+// ================== INISIALISASI SUPABASE (SUDAH DIUPDATE) ==================
+function initSupabase() {
+    try {
+        // Ini yang benar untuk CDN resmi Supabase
+        const { createClient } = supabase;
+        
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        console.log('✅ Supabase client berhasil diinisialisasi');
+    } catch (e) {
+        console.error('❌ Gagal init Supabase:', e);
+        console.error('💡 Pastikan script CDN sudah ada di <head>');
+    }
+}
 
 // ================== CONFETTI ==================
 function launchConfetti() {
@@ -272,9 +288,6 @@ async function submitToGoogleSheet(username) {
     }
 }
 
-// Modal logic
-let currentStep = 1;
-let walletConnected = false;
 
 function openMintModal() {
     document.getElementById('mintModal').classList.remove('hidden');
@@ -343,38 +356,36 @@ let provider;
 let signer;
 let userWalletAddress = null;
 
-// ================== INISIALISASI SUPABASE (SUDAH DIUPDATE) ==================
-function initSupabase() {
-    try {
-        // Ini yang benar untuk CDN resmi Supabase
-        const { createClient } = supabase;
-        
-        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        console.log('✅ Supabase client berhasil diinisialisasi');
-    } catch (e) {
-        console.error('❌ Gagal init Supabase:', e);
-        console.error('💡 Pastikan script CDN sudah ada di <head>');
-    }
-}
 
-// ================== REAL WALLET CONNECT (TEMPO) ==================
+// ================== WALLET CONNECT (TEMPO) ==================
 async function connectWallet() {
     if (typeof window.ethereum === "undefined") {
-        alert("❌ Please install MetaMask or Rabby Wallet first!");
+        alert("❌ Install MetaMask / Rabby Wallet dulu!");
         return;
     }
 
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-        
+
+        // Tambah network TEMPO otomatis
+        await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+                chainId: '0x1079',
+                chainName: 'TEMPO Mainnet',
+                nativeCurrency: { name: 'USD', symbol: 'USD', decimals: 18 },
+                rpcUrls: ['https://1rpc.io/tempo'],
+                blockExplorerUrls: ['https://explore.tempo.xyz']
+            }]
+        });
+
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         userWalletAddress = await signer.getAddress();
 
-        alert(`✅ TEMPO Wallet Connected!\n\n${userWalletAddress}`);
+        alert(`✅ Connected!\n${userWalletAddress}`);
 
-        // Update tombol Connect Wallet
+        // Update tombol
         document.querySelectorAll('button').forEach(btn => {
             if (btn.textContent.includes('Connect Wallet')) {
                 btn.textContent = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`;
@@ -382,7 +393,7 @@ async function connectWallet() {
         });
     } catch (e) {
         console.error(e);
-        alert("❌ Gagal menghubungkan wallet");
+        alert("❌ Gagal connect wallet");
     }
 }
 
@@ -390,23 +401,16 @@ async function connectWalletInModal() {
     await connectWallet();
     if (userWalletAddress) {
         walletConnected = true;
-        document.getElementById('walletAddressDisplay').innerHTML = `
-            ✅ Connected<br>
-            <span class="font-mono text-xs">${userWalletAddress}</span>
-        `;
-        setTimeout(() => { if (currentStep === 2) nextStep(); }, 800);
+        document.getElementById('walletAddressDisplay').innerHTML = `✅ Connected<br><span class="font-mono text-xs">${userWalletAddress}</span>`;
+        if (currentStep === 2) nextStep();
     }
 }
 
-// ================== CEK & SIMPAN MINT KE SUPABASE ==================
+// ================== SAVE MINT (dengan cek duplikat) ==================
 async function saveMintToSupabase(telegram, bearNumber) {
-    if (!userWalletAddress) {
-        alert("❌ Wallet belum terhubung!");
-        return false;
-    }
+    if (!userWalletAddress) return false;
 
     try {
-        // Cek apakah wallet sudah pernah claim
         const { data: existing } = await supabaseClient
             .from('whitelist_claims')
             .select('id')
@@ -418,67 +422,49 @@ async function saveMintToSupabase(telegram, bearNumber) {
             return false;
         }
 
-        // Simpan data baru
-        const { error } = await supabaseClient
-            .from('whitelist_claims')
-            .insert({
-                wallet_address: userWalletAddress,
-                telegram: telegram,
-                bear_number: bearNumber,
-                tasks_completed: tasks.filter(t => t.completed).length
-            });
+        const { error } = await supabaseClient.from('whitelist_claims').insert({
+            wallet_address: userWalletAddress,
+            telegram: telegram,
+            bear_number: bearNumber,
+            tasks_completed: tasks.filter(t => t.completed).length
+        });
 
         if (error) throw error;
-
-        console.log('✅ Mint data berhasil disimpan ke Supabase');
         return true;
-
     } catch (err) {
-        console.error('❌ Gagal menyimpan mint:', err);
-        alert("❌ Gagal menyimpan data mint. Coba lagi.");
+        console.error(err);
+        alert("❌ Gagal menyimpan data mint");
         return false;
     }
 }
 
-// ================== UPDATE performMint() ==================
+// ================== PERFORM MINT ==================
 async function performMint() {
     const number = Math.floor(Math.random() * 777) + 1;
     const tgUsername = document.getElementById('tgUsername').value.trim();
 
     const btn = event.currentTarget;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-3"></i> MINTING ON TEMPO...`;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-3"></i> MINTING...`;
     btn.disabled = true;
 
-    try {
-        // Simpan ke Supabase terlebih dahulu
-        const saved = await saveMintToSupabase(tgUsername, number);
-        
-        if (!saved) {
-            btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
-            btn.disabled = false;
-            return;
-        }
-
-        launchConfetti();
-
-        setTimeout(() => {
-            alert(`🎉 CONGRATULATIONS!\n\nYou minted Belly Bear #${number}!\n\nWallet: ${userWalletAddress}\n\nData telah disimpan.`);
-            closeMintModal();
-            
-            btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
-            btn.disabled = false;
-
-            // Update counter
-            let count = parseInt(document.getElementById('mintedCount').textContent) || 231;
-            document.getElementById('mintedCount').textContent = count + 1;
-        }, 1800);
-
-    } catch (e) {
-        console.error(e);
-        alert("Terjadi kesalahan saat minting.");
+    const saved = await saveMintToSupabase(tgUsername, number);
+    if (!saved) {
         btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
         btn.disabled = false;
+        return;
     }
+
+    launchConfetti();
+
+    setTimeout(() => {
+        alert(`🎉 SUCCESS!\n\nBelly Bear #${number} minted!\nWallet: ${userWalletAddress}`);
+        closeMintModal();
+        btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
+        btn.disabled = false;
+
+        let count = parseInt(document.getElementById('mintedCount').textContent) || 231;
+        document.getElementById('mintedCount').textContent = count + 1;
+    }, 1800);
 }
 
 // Animate roadmap
@@ -500,24 +486,19 @@ function toggleMobileMenu() {
     menu.classList.toggle('hidden');
 }
 
-// ================== INITIALIZE SEMUA ==================
+// ================== INITIALIZE ==================
 window.onload = async () => {
     loadTasks();
     renderTasksSection();
     animateRoadmap();
 
     initSupabase();
-    
-    // Panggil leaderboard
     await fetchLeaderboard();
 
-    // Fake minted count
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');
-        let count = parseInt(countEl.textContent);
-        if (count < 300) {
-            countEl.textContent = count + Math.floor(Math.random() * 3) + 1;
-        }
+        let count = parseInt(countEl.textContent) || 231;
+        if (count < 300) countEl.textContent = count + Math.floor(Math.random() * 3) + 1;
     }, 8000);
 
     console.log('%c✅ Belly Bears WEBSITE READY!', 'color:#f39c12; font-size:15px; font-weight:bold');
