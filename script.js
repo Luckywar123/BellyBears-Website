@@ -13,17 +13,17 @@ function initSupabase() {
     supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
-// ================== LEADERBOARD REAL ONLY (Tanpa Fake) ==================
+// ================== LEADERBOARD REAL ONLY ==================
 async function fetchLeaderboard() {
     const container = document.getElementById('leaderboardDemo');
     
     if (!container) {
-        console.error('❌ Element leaderboardDemo tidak ditemukan di HTML');
+        console.error('❌ Element #leaderboardDemo tidak ditemukan!');
         return;
     }
 
     try {
-        console.log('🔄 Mengambil leaderboard dari Supabase...');
+        console.log('🔄 Mengambil data leaderboard...');
 
         const { data, error } = await supabaseClient
             .from('highscores')
@@ -34,16 +34,15 @@ async function fetchLeaderboard() {
         if (error) throw error;
 
         if (!data || data.length === 0) {
-            container.innerHTML = `<p class="text-yellow-400 text-center py-8">Belum ada data leaderboard</p>`;
+            container.innerHTML = `<p class="text-yellow-400 text-center py-8">Belum ada data di leaderboard</p>`;
             return;
         }
 
-        // Render data real
         container.innerHTML = data.map((p, i) => `
             <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
                 <div class="flex items-center gap-3">
                     <span class="text-[#f39c12] font-bold">#${i+1}</span>
-                    <span>${p.username || 'Anonymous'}</span>
+                    <span>${p.username}</span>
                 </div>
                 <span class="font-mono">${p.best_score} pts</span>
             </div>
@@ -52,49 +51,9 @@ async function fetchLeaderboard() {
         console.log('✅ Leaderboard berhasil ditampilkan');
 
     } catch (err) {
-        console.error('❌ Error fetch leaderboard:', err);
+        console.error('❌ Error leaderboard:', err);
         container.innerHTML = `<p class="text-red-400 text-center py-8">Gagal memuat leaderboard</p>`;
     }
-}
-
-// Render leaderboard (real atau fake)
-function renderLeaderboard(players) {
-    const container = document.getElementById('leaderboardDemo');
-    
-    // Kalau kosong, pakai fake data
-    if (!players || players.length === 0) {
-        renderFakeLeaderboard();
-        return;
-    }
-
-    container.innerHTML = players.map((p, i) => `
-        <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
-            <div class="flex items-center gap-3">
-                <span class="text-[#f39c12] font-bold">#${i+1}</span>
-                <span>${p.username || 'Anonymous'}</span>
-            </div>
-            <span class="font-mono">${p.best_score || 0} pts</span>
-        </div>
-    `).join('');
-}
-
-// Fake leaderboard (fallback)
-function renderFakeLeaderboard() {
-    const container = document.getElementById('leaderboardDemo');
-    const players = [
-        { username: "ChubbyKing88", best_score: 12480 },
-        { username: "BellyBoss", best_score: 11390 },
-        { username: "FluffyTon", best_score: 10920 }
-    ];
-    container.innerHTML = players.map((p, i) => `
-        <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
-            <div class="flex items-center gap-3">
-                <span class="text-[#f39c12] font-bold">#${i+1}</span>
-                <span>${p.username}</span>
-            </div>
-            <span class="font-mono">${p.best_score} pts</span>
-        </div>
-    `).join('');
 }
 
 // ================== TASKS & MODAL (Kode lama kamu tetap utuh) ==================
