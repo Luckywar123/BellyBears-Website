@@ -4,7 +4,7 @@ const SHEET_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwoLijBi7RfKL
 // ================== SUPABASE CONFIG ==================
 // GANTI DENGAN DATA KAMU DARI SUPABASE DASHBOARD
 const SUPABASE_URL = 'https://tfdxmqvkkiidujrunfcp.supabase.co';     // ← Project URL kamu
-const SUPABASE_ANON_KEY = 'sb_publishable_5b1Rg4Owdcr_L18qvWwQ3A_exEiIKt3';                         // ← Anon Public Key kamu
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmZHhtcXZra2lpZHVqcnVuZmNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjI5MTksImV4cCI6MjA4ODk5ODkxOX0.hKf_DquWy9dosADgAHedk7qyN4QPX31k8upzW4SDK3Q';                         // ← Anon Public Key kamu
 
 let supabaseClient;
 
