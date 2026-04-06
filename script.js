@@ -212,6 +212,22 @@ function renderModalTasks() {
     });
 }
 
+function updateTaskProgress() {
+    const completed = tasks.filter(t => t.completed).length;
+    const total = tasks.length;
+    const percentage = (completed / total) * 100;
+    
+    const circle = document.getElementById('progressCircle');
+    const text = document.getElementById('progressText');
+    
+    if (circle && text) {
+        const circumference = 94.2; // 2 * PI * r (r=15)
+        const offset = circumference - (percentage / 100 * circumference);
+        circle.style.strokeDashoffset = offset;
+        text.textContent = `${completed}/${total}`;
+    }
+}
+
 function markTask(id) {
     const task = tasks.find(t => t.id === id);
     if (task) {
