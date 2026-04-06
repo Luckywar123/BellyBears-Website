@@ -11,6 +11,7 @@ let supabaseClient;
 // Inisialisasi Supabase
 function initSupabase() {
     try {
+        const { createClient } = supabase;
         supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('✅ Supabase client berhasil diinisialisasi');
     } catch (e) {
