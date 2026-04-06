@@ -13,9 +13,18 @@ function initSupabase() {
     supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
-// Fetch Top 3 dari database
+// ================== LEADERBOARD REAL ONLY (Tanpa Fake) ==================
 async function fetchLeaderboard() {
+    const container = document.getElementById('leaderboardDemo');
+    
+    if (!container) {
+        console.error('❌ Element leaderboardDemo tidak ditemukan di HTML');
+        return;
+    }
+
     try {
+        console.log('🔄 Mengambil leaderboard dari Supabase...');
+
         const { data, error } = await supabaseClient
             .from('highscores')
             .select('username, best_score')
@@ -23,10 +32,28 @@ async function fetchLeaderboard() {
             .limit(3);
 
         if (error) throw error;
-        return data || [];
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p class="text-yellow-400 text-center py-8">Belum ada data leaderboard</p>`;
+            return;
+        }
+
+        // Render data real
+        container.innerHTML = data.map((p, i) => `
+            <div class="leaderboard-row flex justify-between items-center bg-[#1e2937] px-5 py-3 rounded-2xl text-sm">
+                <div class="flex items-center gap-3">
+                    <span class="text-[#f39c12] font-bold">#${i+1}</span>
+                    <span>${p.username || 'Anonymous'}</span>
+                </div>
+                <span class="font-mono">${p.best_score} pts</span>
+            </div>
+        `).join('');
+
+        console.log('✅ Leaderboard berhasil ditampilkan');
+
     } catch (err) {
         console.error('❌ Error fetch leaderboard:', err);
-        return []; // fallback ke fake data
+        container.innerHTML = `<p class="text-red-400 text-center py-8">Gagal memuat leaderboard</p>`;
     }
 }
 
