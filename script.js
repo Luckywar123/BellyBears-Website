@@ -152,8 +152,7 @@ function saveTasks() {
 function renderTasksSection() {
     const container = document.getElementById('tasksList');
     container.innerHTML = '';
-    
-    tasks.forEach((task, index) => {
+    tasks.forEach((task) => {
         const div = document.createElement('div');
         div.className = `task-card group flex items-center justify-between p-6 rounded-3xl transition-all duration-500 ${task.completed ? 'task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
         
@@ -354,38 +353,25 @@ function submitTasksAndContinue() {
 
 let provider;
 let signer;
-let userWalletAddress = null;
 
 
 // ================== WALLET CONNECT (TEMPO) ==================
 async function connectWallet() {
     if (typeof window.ethereum === "undefined") {
-        alert("❌ Install MetaMask / Rabby Wallet dulu!");
+        alert("❌ Install MetaMask atau Rabby Wallet dulu!");
         return;
     }
 
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
 
-        // Tambah network TEMPO otomatis
-        await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-                chainId: '0x1079',
-                chainName: 'TEMPO Mainnet',
-                nativeCurrency: { name: 'USD', symbol: 'USD', decimals: 18 },
-                rpcUrls: ['https://1rpc.io/tempo'],
-                blockExplorerUrls: ['https://explore.tempo.xyz']
-            }]
-        });
-
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         userWalletAddress = await signer.getAddress();
 
-        alert(`✅ Connected!\n${userWalletAddress}`);
+        alert(`✅ TEMPO Wallet Connected!\n\n${userWalletAddress}`);
 
-        // Update tombol
+        // Update tombol Connect Wallet
         document.querySelectorAll('button').forEach(btn => {
             if (btn.textContent.includes('Connect Wallet')) {
                 btn.textContent = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`;
@@ -401,14 +387,20 @@ async function connectWalletInModal() {
     await connectWallet();
     if (userWalletAddress) {
         walletConnected = true;
-        document.getElementById('walletAddressDisplay').innerHTML = `✅ Connected<br><span class="font-mono text-xs">${userWalletAddress}</span>`;
+        document.getElementById('walletAddressDisplay').innerHTML = `
+            ✅ Connected<br>
+            <span class="font-mono text-xs">${userWalletAddress}</span>
+        `;
         if (currentStep === 2) nextStep();
     }
 }
 
-// ================== SAVE MINT (dengan cek duplikat) ==================
+// ================== SAVE MINT & PERFORM MINT ==================
 async function saveMintToSupabase(telegram, bearNumber) {
-    if (!userWalletAddress) return false;
+    if (!userWalletAddress) {
+        alert("❌ Wallet belum terhubung!");
+        return false;
+    }
 
     try {
         const { data: existing } = await supabaseClient
@@ -430,6 +422,7 @@ async function saveMintToSupabase(telegram, bearNumber) {
         });
 
         if (error) throw error;
+        console.log('✅ Data mint berhasil disimpan');
         return true;
     } catch (err) {
         console.error(err);
@@ -438,13 +431,12 @@ async function saveMintToSupabase(telegram, bearNumber) {
     }
 }
 
-// ================== PERFORM MINT ==================
 async function performMint() {
     const number = Math.floor(Math.random() * 777) + 1;
     const tgUsername = document.getElementById('tgUsername').value.trim();
 
     const btn = event.currentTarget;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-3"></i> MINTING...`;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-3"></i> MINTING ON TEMPO...`;
     btn.disabled = true;
 
     const saved = await saveMintToSupabase(tgUsername, number);
@@ -457,7 +449,7 @@ async function performMint() {
     launchConfetti();
 
     setTimeout(() => {
-        alert(`🎉 SUCCESS!\n\nBelly Bear #${number} minted!\nWallet: ${userWalletAddress}`);
+        alert(`🎉 CONGRATULATIONS!\n\nYou minted Belly Bear #${number}!\nWallet: ${userWalletAddress}`);
         closeMintModal();
         btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
         btn.disabled = false;
@@ -467,20 +459,17 @@ async function performMint() {
     }, 1800);
 }
 
-// Animate roadmap
+// ================== ROADMAP & MOBILE ==================
 function animateRoadmap() {
     const cards = document.querySelectorAll('.roadmap-card');
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-            }
+            if (entry.isIntersecting) entry.target.classList.add('visible');
         });
     }, { threshold: 0.3 });
     cards.forEach(card => observer.observe(card));
 }
 
-// Mobile menu
 function toggleMobileMenu() {
     const menu = document.getElementById('mobileMenu');
     menu.classList.toggle('hidden');
