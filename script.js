@@ -336,10 +336,11 @@ window.onload = async () => {
     renderTasksSection();
     animateRoadmap();
 
-    // Inisialisasi Supabase + fetch leaderboard
+    // Inisialisasi Supabase
     initSupabase();
-    const leaderboardData = await fetchLeaderboard();
-    renderLeaderboard(leaderboardData);
+
+    // Fetch & Render Leaderboard
+    await fetchAndRenderLeaderboard();
 
     // Fake live minted count
     setInterval(() => {
@@ -350,5 +351,5 @@ window.onload = async () => {
         }
     }, 8000);
 
-    console.log('%c✅ Belly Bears WEBSITE READY with Supabase Leaderboard!', 'color:#f39c12; font-size:15px; font-weight:bold');
+    console.log('%c✅ Belly Bears WEBSITE READY!', 'color:#f39c12; font-size:15px; font-weight:bold');
 };
