@@ -23,6 +23,60 @@ function initSupabase() {
     }
 }
 
+
+// ================== CONFETTI KECE ==================
+function launchConfetti() {
+    const canvas = document.createElement('canvas');
+    canvas.id = 'confetti-canvas';
+    document.body.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#f39c12', '#e67e22', '#10b981', '#229ED9', '#f1c40f'];
+    let particles = [];
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height - canvas.height;
+            this.size = Math.random() * 12 + 6;
+            this.speed = Math.random() * 8 + 5;
+            this.angle = Math.random() * 360;
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.y += this.speed;
+            this.angle += 8;
+        }
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle * Math.PI / 180);
+            ctx.fillStyle = this.color;
+            ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
+            ctx.restore();
+        }
+    }
+
+    for (let i = 0; i < 180; i++) {
+        particles.push(new Particle());
+    }
+
+    function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+            p.update();
+            p.draw();
+            if (p.y > canvas.height) particles.splice(i, 1);
+        });
+        if (particles.length > 0) requestAnimationFrame(animateConfetti);
+        else canvas.remove();
+    }
+    animateConfetti();
+}
+
 // ================== LEADERBOARD REAL ONLY ==================
 async function fetchLeaderboard() {
     const container = document.getElementById('leaderboardDemo');
@@ -97,7 +151,7 @@ function renderTasksSection() {
     container.innerHTML = '';
     tasks.forEach(task => {
         const div = document.createElement('div');
-        div.className = `flex items-center justify-between p-6 rounded-3xl transition-all ${task.completed ? 'bg-emerald-900/30 task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
+        div.className = `task-card flex items-center justify-between p-6 rounded-3xl transition-all ${task.completed ? 'bg-emerald-900/30 task-completed' : 'bg-[#1e2937] hover:bg-[#2a2140]'}`;
         div.innerHTML = `
             <div class="flex items-center gap-4">
                 ${task.completed ? 
@@ -180,6 +234,7 @@ function claimGameWL() {
         saveTasks();
         renderTasksSection();
         renderModalTasks();
+        launchConfetti();                    // Tambahkan confetti saat klaim Game WL
         alert("🎉 Congratulations! You received Guaranteed WL from the game leaderboard!\n\nYour spot is secured.");
     }
 }
@@ -298,6 +353,7 @@ function performMint() {
     btn.disabled = true;
     
     setTimeout(() => {
+        launchConfetti();                    // ← confetti kece
         alert(`🎉 CONGRATULATIONS!\n\nYou minted Belly Bear #${number}!\n\nNFT sent to your wallet on TEMPO.`);
         closeMintModal();
         btn.innerHTML = `MINT BEAR #<span id="randomBearNumber">${number}</span>`;
