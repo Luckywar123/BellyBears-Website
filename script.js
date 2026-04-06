@@ -363,13 +363,12 @@ window.onload = async () => {
     renderTasksSection();
     animateRoadmap();
 
-    // Inisialisasi Supabase
     initSupabase();
+    
+    // Panggil leaderboard
+    await fetchLeaderboard();
 
-    // Fetch & Render Leaderboard
-    await fetchAndRenderLeaderboard();
-
-    // Fake live minted count
+    // Fake minted count
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');
         let count = parseInt(countEl.textContent);
