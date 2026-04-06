@@ -8,14 +8,18 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let supabaseClient;
 
-// Inisialisasi Supabase
+// ================== INISIALISASI SUPABASE (SUDAH DIUPDATE) ==================
 function initSupabase() {
     try {
+        // Ini yang benar untuk CDN resmi Supabase
         const { createClient } = supabase;
-        supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         console.log('✅ Supabase client berhasil diinisialisasi');
     } catch (e) {
         console.error('❌ Gagal init Supabase:', e);
+        console.error('💡 Pastikan script CDN sudah ada di <head>');
     }
 }
 
