@@ -10,7 +10,12 @@ let supabaseClient;
 
 // Inisialisasi Supabase
 function initSupabase() {
-    supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    try {
+        supabaseClient = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase client berhasil diinisialisasi');
+    } catch (e) {
+        console.error('❌ Gagal init Supabase:', e);
+    }
 }
 
 // ================== LEADERBOARD REAL ONLY ==================
