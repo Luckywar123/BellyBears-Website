@@ -713,6 +713,22 @@ window.onload = async () => {
 
     initSupabase();
     await fetchLeaderboard();
+
+    // === LOAD WALLET SESSION DULU ===
+    const savedWallet = loadWalletSession();
+    if (savedWallet) {
+        userWalletAddress = savedWallet;
+        
+        // Update navbar button
+        const connectBtn = document.querySelector('button[onclick="connectWallet()"]');
+        if (connectBtn) {
+            connectBtn.innerHTML = `✅ ${savedWallet.slice(0,6)}...${savedWallet.slice(-4)} 
+                <span onclick="logoutWallet();event.stopImmediatePropagation()" 
+                      class="ml-2 text-xs text-red-400 hover:text-red-500">(logout)</span>`;
+        }
+    }
+
+    // === BARU JALANKAN CHECK MY PASS ===
     checkMyPass();
 
     // Congrats kalau task selesai
@@ -723,22 +739,10 @@ window.onload = async () => {
                 <p class="text-lg">Kamu sudah mendapatkan Whitelist!</p>
                 <p class="mt-2">Sekarang ayo main game dan rebut leaderboard 🏆</p>
                 <a href="https://t.me/bellybears_bot" target="_blank" 
-                class="mt-6 inline-block px-8 py-4 bg-black text-white rounded-3xl font-bold">PLAY GAME NOW →</a>
+                   class="mt-6 inline-block px-8 py-4 bg-black text-white rounded-3xl font-bold">PLAY GAME NOW →</a>
             </div>`;
         document.getElementById('tasksList').insertAdjacentHTML('afterend', congratsHTML);
     }
-
-    // Load wallet session
-    const savedWallet = loadWalletSession();
-    if (savedWallet) {
-        userWalletAddress = savedWallet;
-        // Update navbar button
-        const connectBtn = document.querySelector('button[onclick="connectWallet()"]');
-        if (connectBtn) {
-            connectBtn.innerHTML = `✅ ${savedWallet.slice(0,6)}...${savedWallet.slice(-4)} <span onclick="logoutWallet();event.stopImmediatePropagation()" class="ml-2 text-xs text-red-400 hover:text-red-500">(logout)</span>`;
-        }
-    }
-
 
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');
