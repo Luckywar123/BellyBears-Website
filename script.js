@@ -629,6 +629,8 @@ async function linkTelegramAfterPayment() {
         alert(`🎉 Success!\n\nBelly Pass kamu aktif selama 30 hari.\nPower-up sudah siap di Telegram Game!`);
         closeBellyPassModal();
 
+        checkMyPass();
+
     } catch (err) {
         console.error(err);
         alert("❌ Gagal menyimpan data pass. Coba lagi.");
@@ -650,16 +652,18 @@ async function checkMyPass() {
             .eq('active', true)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+
 
         const card = document.getElementById('myPassCard');
         const noPass = document.getElementById('noPassMessage');
 
-        if (error || !data) {
+        if (error || !data || data.length === 0) {
             if (card) card.classList.add('hidden');
             if (noPass) noPass.classList.remove('hidden');
             return;
         }
+
+        const pass = data[0];
 
         const expiry = new Date(data.expiry_date);
         const now = new Date();
@@ -669,7 +673,7 @@ async function checkMyPass() {
             document.getElementById('passExpiry').textContent = `${daysLeft} days left`;
         
         if (document.getElementById('telegramLinked')) 
-            document.getElementById('telegramLinked').textContent = `Linked to: ${data.telegram_username || 'Not linked'}`;
+            document.getElementById('telegramLinked').textContent = `Linked to: ${pass.telegram_username || 'Not linked'}`;
 
         if (card) card.classList.remove('hidden');
         if (noPass) noPass.classList.add('hidden');
