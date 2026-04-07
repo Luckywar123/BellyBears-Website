@@ -173,16 +173,16 @@ function renderTasksSection() {
             
             <div>
                 ${task.completed 
-                    ? `<span class="px-6 py-3 bg-emerald-400 text-black text-sm font-bold rounded-2xl">DONE</span>`
+                    ? `<span class="px-6 py-3 bg-emerald-400 text-black text-sm font-bold rounded-2xl">✅ DONE</span>`
                     : task.gameTask 
                         ? `<button onclick="claimGameWL(); event.stopImmediatePropagation()" 
-                                   class="px-8 py-3 bg-[#10b981] hover:bg-emerald-400 font-bold rounded-2xl text-sm transition-all">
+                                class="px-8 py-3 bg-[#10b981] hover:bg-emerald-400 font-bold rounded-2xl text-sm transition-all">
                             VERIFY GAME WL
-                           </button>`
+                        </button>`
                         : `<a href="${task.link}" target="_blank" onclick="markTask(${task.id}); event.stopImmediatePropagation()" 
-                             class="px-8 py-3 bg-white/10 hover:bg-[#f39c12] hover:text-black font-semibold rounded-2xl text-sm transition-all">
+                            class="px-8 py-3 bg-white/10 hover:bg-[#f39c12] hover:text-black font-semibold rounded-2xl text-sm transition-all">
                             DO TASK
-                           </a>`
+                        </a>`
                 }
             </div>
         `;
@@ -364,19 +364,20 @@ async function connectWallet() {
 
     try {
         await window.ethereum.request({ method: 'eth_requestAccounts' });
-
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         userWalletAddress = await signer.getAddress();
 
-        alert(`✅ TEMPO Wallet Connected!\n\n${userWalletAddress}`);
+        saveWalletSession(userWalletAddress);   // ← simpan session
 
-        // Update tombol Connect Wallet
+        // Update semua tombol
         document.querySelectorAll('button').forEach(btn => {
             if (btn.textContent.includes('Connect Wallet')) {
-                btn.textContent = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`;
+                btn.innerHTML = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)} <span onclick="logoutWallet();event.stopImmediatePropagation()" class="ml-2 text-xs text-red-400 hover:text-red-500">(logout)</span>`;
             }
         });
+
+        alert(`✅ TEMPO Wallet Connected!\n\n${userWalletAddress}`);
     } catch (e) {
         console.error(e);
         alert("❌ Gagal connect wallet");
@@ -651,8 +652,7 @@ async function checkMyPass() {
             .eq('wallet_address', userWalletAddress)
             .eq('active', true)
             .order('created_at', { ascending: false })
-            .limit(1)
-
+            .limit(1);
 
         const card = document.getElementById('myPassCard');
         const noPass = document.getElementById('noPassMessage');
@@ -665,14 +665,14 @@ async function checkMyPass() {
 
         const pass = data[0];
 
-        const expiry = new Date(data.expiry_date);
+        const expiry = new Date(pass.expiry_date);   // ← ini yang salah sebelumnya
         const now = new Date();
         const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
 
-        if (document.getElementById('passExpiry')) 
+        if (document.getElementById('passExpiry'))
             document.getElementById('passExpiry').textContent = `${daysLeft} days left`;
-        
-        if (document.getElementById('telegramLinked')) 
+
+        if (document.getElementById('telegramLinked'))
             document.getElementById('telegramLinked').textContent = `Linked to: ${pass.telegram_username || 'Not linked'}`;
 
         if (card) card.classList.remove('hidden');
@@ -681,6 +681,27 @@ async function checkMyPass() {
     } catch (err) {
         console.error("Error checkMyPass:", err);
     }
+}
+
+// ================== WALLET SESSION PERSISTENT ==================
+function saveWalletSession(address) {
+    localStorage.setItem('bellyWallet', address);
+}
+
+function loadWalletSession() {
+    return localStorage.getItem('bellyWallet');
+}
+
+function logoutWallet() {
+    localStorage.removeItem('bellyWallet');
+    userWalletAddress = null;
+    window.location.reload();
+}
+
+
+function toggleMusic() {
+    const audio = document.getElementById('bgMusic');
+    audio.paused ? audio.play() : audio.pause();
 }
 
 
@@ -693,6 +714,31 @@ window.onload = async () => {
     initSupabase();
     await fetchLeaderboard();
     checkMyPass();
+
+    // Congrats kalau task selesai
+    if (tasks.filter(t => t.completed).length >= 3) {
+        const congratsHTML = `
+            <div class="mt-8 p-6 bg-gradient-to-r from-emerald-500 to-cyan-500 text-black rounded-3xl text-center">
+                <h3 class="text-2xl font-bold">🎉 Congratulations!</h3>
+                <p class="text-lg">Kamu sudah mendapatkan Whitelist!</p>
+                <p class="mt-2">Sekarang ayo main game dan rebut leaderboard 🏆</p>
+                <a href="https://t.me/bellybears_bot" target="_blank" 
+                class="mt-6 inline-block px-8 py-4 bg-black text-white rounded-3xl font-bold">PLAY GAME NOW →</a>
+            </div>`;
+        document.getElementById('tasksList').insertAdjacentHTML('afterend', congratsHTML);
+    }
+
+    // Load wallet session
+    const savedWallet = loadWalletSession();
+    if (savedWallet) {
+        userWalletAddress = savedWallet;
+        // Update navbar button
+        const connectBtn = document.querySelector('button[onclick="connectWallet()"]');
+        if (connectBtn) {
+            connectBtn.innerHTML = `✅ ${savedWallet.slice(0,6)}...${savedWallet.slice(-4)} <span onclick="logoutWallet();event.stopImmediatePropagation()" class="ml-2 text-xs text-red-400 hover:text-red-500">(logout)</span>`;
+        }
+    }
+
 
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');

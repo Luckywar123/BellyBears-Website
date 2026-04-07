@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+    <link rel="icon" href="Assets/BellyBearsLogo-Ver.jpeg" type="image/jpeg">
 </head>
 <body class="bg-[#0f172a] text-white">
 
@@ -50,13 +51,21 @@
         </div>
         
         <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden bg-[#0f172a] border-t border-white/10 px-6 py-4">
-            <div class="flex flex-col gap-4 text-lg">
+        <div id="mobileMenu" class="hidden md:hidden bg-[#0f172a] border-t border-white/10 px-6 py-6">
+            <div class="flex flex-col gap-4 text-lg font-medium">
                 <a href="#mint" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Mint</a>
                 <a href="#tasks" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Tasks</a>
                 <a href="#roadmap" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Roadmap</a>
                 <a href="#team" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Team</a>
                 <a href="#game" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Play Game</a>
+                <a href="#bellypass" onclick="toggleMobileMenu()" class="hover:text-[#f39c12] font-bold text-[#f39c12]">Belly Pass</a>
+                <a href="#mypass" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">My Pass</a>
+                
+                <div class="pt-4 border-t border-white/10">
+                    <button onclick="connectWallet();toggleMobileMenu()" class="w-full py-3 bg-[#f39c12] text-black font-bold rounded-3xl">
+                        Connect Wallet
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -624,5 +633,11 @@
 
     
     <script src="script.js"></script>
+
+    <audio id="bgMusic" loop>
+        <source src="Assets/bgm-web.m4a" type="audio/mp4a">
+    </audio>
+    <button onclick="toggleMusic()" class="fixed bottom-6 right-6 bg-[#f39c12] text-black p-4 rounded-full shadow-xl">🎵</button>
+
 </body>
 </html>
