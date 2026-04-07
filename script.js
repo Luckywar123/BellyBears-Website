@@ -556,11 +556,11 @@ async function buyPassWithPathUSD() {
     }
 }
 
-// ================== BELLY PASS SYSTEM ==================
-// Tambahkan kode ini di paling bawah script.js (sebelum window.onload)
+// ================== BELLY PASS SYSTEM (ENGLISH) ==================
+// Letakkan di paling bawah script.js, sebelum window.onload
 
-const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_DISINI";   // ← GANTI INI
-const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_DISINI"; // ← GANTI INI
+const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_DISINI";   
+const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_DISINI"; 
 
 const PATHUSD_ABI = [
     "function transfer(address to, uint256 amount) returns (bool)"
@@ -568,7 +568,7 @@ const PATHUSD_ABI = [
 
 let currentPassTxHash = null;
 
-// ================== OPEN & CLOSE MODAL ==================
+// Open Modal
 function openBellyPassModal() {
     const modal = document.getElementById('bellyPassModal');
     if (!modal) return;
@@ -583,17 +583,17 @@ function closeBellyPassModal() {
     if (modal) modal.classList.add('hidden');
 }
 
-// ================== BUY PASS WITH PATHUSD ==================
+// Buy Pass
 async function buyPassWithPathUSD() {
     if (!userWalletAddress) {
-        alert("⚠️ Harap connect wallet TEMPO terlebih dahulu!");
+        alert("⚠️ Please connect your TEMPO wallet first!");
         await connectWallet();
         if (!userWalletAddress) return;
     }
 
     const btn = event.currentTarget;
     const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Memproses pembayaran...`;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Processing payment...`;
     btn.disabled = true;
 
     try {
@@ -601,50 +601,47 @@ async function buyPassWithPathUSD() {
         const signer = await provider.getSigner();
 
         const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
-        const amount = ethers.parseUnits("2", 18); // 2 PATHUSD
+        const amount = ethers.parseUnits("2", 18);
 
         const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
         await tx.wait();
 
         currentPassTxHash = tx.hash;
 
-        // Tampilkan step 2 (Link Telegram)
         document.getElementById('passStep1').classList.add('hidden');
         document.getElementById('passStep2').classList.remove('hidden');
 
         launchConfetti();
-
-        console.log("✅ Payment Belly Pass berhasil:", tx.hash);
+        console.log("✅ Belly Pass payment successful:", tx.hash);
 
     } catch (err) {
         console.error(err);
-        alert("❌ Pembayaran dibatalkan atau gagal.\n\nPastikan saldo PATHUSD cukup dan jaringan TEMPO aktif.");
+        alert("❌ Payment failed or cancelled.\nMake sure you have enough PATHUSD and are on the TEMPO network.");
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// ================== LINK TELEGRAM AFTER PAYMENT ==================
+// Link Telegram
 async function linkTelegramAfterPayment() {
-    const usernameInput = document.getElementById('passTgUsername');
-    const username = usernameInput ? usernameInput.value.trim() : '';
+    const username = document.getElementById('passTgUsername').value.trim();
 
     if (!username || !username.startsWith('@')) {
-        alert("❌ Masukkan Telegram username dengan benar (contoh: @namauser)");
+        alert("❌ Please enter a valid Telegram username (e.g. @yourname)");
         return;
     }
 
     const btn = event.currentTarget;
     const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Menyimpan...`;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Saving...`;
     btn.disabled = true;
 
     try {
         const { error } = await supabaseClient.from('belly_passes').insert({
             wallet_address: userWalletAddress,
             telegram_username: username,
-            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 hari
+            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
             power_ups: {
                 combo_master: true,
                 shield: 3,
@@ -655,12 +652,12 @@ async function linkTelegramAfterPayment() {
 
         if (error) throw error;
 
-        alert(`🎉 Berhasil!\n\nBelly Pass 1 bulan telah aktif.\n\nPower-up akan langsung tersedia di game Telegram kamu.`);
+        alert(`🎉 Success!\n\nYour 1-month Belly Pass has been activated.\n\nPower-ups are now ready in the Telegram game!`);
         closeBellyPassModal();
 
     } catch (err) {
         console.error(err);
-        alert("❌ Gagal menyimpan data Belly Pass. Silakan coba lagi.");
+        alert("❌ Failed to save pass data. Please try again.");
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;

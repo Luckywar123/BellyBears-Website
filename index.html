@@ -321,13 +321,13 @@
     </section>
 
 
-    <!-- ================== BELLY PASS SECTION ================== -->
+    <!-- ================== BELLY PASS SECTION (ENGLISH) ================== -->
     <section id="bellypass" class="py-24 bg-[#1e2937]">
         <div class="max-w-6xl mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="text-5xl font-bold mb-3">Belly Pass</h2>
                 <p class="text-2xl text-[#f39c12]">1 Month Power-Up • Combo Master + Shield 3x + Coin Magnet</p>
-                <p class="text-gray-400 mt-2">Bayar sekali pakai PATHUSD → langsung aktif di Telegram Game</p>
+                <p class="text-gray-400 mt-3">Pay once with PATHUSD → Instantly active in Telegram Game</p>
             </div>
 
             <div class="grid md:grid-cols-12 gap-8 items-center">
@@ -336,34 +336,37 @@
                     <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
                         <div class="text-5xl mb-4">⚡</div>
                         <h4 class="font-bold text-xl">Combo Master</h4>
-                        <p class="text-sm text-gray-400">Multiplier combo naik 2x lebih cepat</p>
+                        <p class="text-sm text-gray-400">Combo multiplier increases 2x faster</p>
                     </div>
                     <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
                         <div class="text-5xl mb-4">🛡️</div>
                         <h4 class="font-bold text-xl">Shield 3x</h4>
-                        <p class="text-sm text-gray-400">Bisa nyalain 3x per run (kalau koin lolos)</p>
+                        <p class="text-sm text-gray-400">Can be used 3 times per run<br>(when coin is missed)</p>
                     </div>
                     <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
                         <div class="text-5xl mb-4">🧲</div>
                         <h4 class="font-bold text-xl">Coin Magnet</h4>
-                        <p class="text-sm text-gray-400">1 menit per run (bisa diaktifkan manual)</p>
+                        <p class="text-sm text-gray-400">1 minute per run<br>(can be activated manually)</p>
                     </div>
                 </div>
 
                 <!-- Buy Card -->
-                <div class="md:col-span-5 bg-gradient-to-br from-[#f39c12] to-amber-500 text-black rounded-3xl p-10">
-                    <div class="text-center">
-                        <div class="inline px-6 py-2 bg-black/20 text-white rounded-3xl text-sm font-bold">1 BULAN</div>
-                        <h3 class="text-4xl font-black mt-6">Belly Pass</h3>
-                        <div class="text-7xl font-black mt-2">2 PATHUSD</div>
-                        <p class="mt-1 text-black/70">Harga spesial launch</p>
+                <div class="md:col-span-5">
+                    <div class="bg-gradient-to-br from-[#f39c12] to-amber-500 text-black rounded-3xl p-10">
+                        <div class="text-center">
+                            <div class="inline px-6 py-2 bg-black/20 text-white rounded-3xl text-sm font-bold">1 MONTH</div>
+                            
+                            <h3 class="text-4xl font-black mt-6">Belly Pass</h3>
+                            <div class="text-7xl font-black mt-2">2 PATHUSD</div>
+                            <p class="mt-1 text-black/70">Special launch price</p>
 
-                        <button onclick="openBellyPassModal()" 
-                                class="mt-10 w-full py-6 text-2xl font-bold bg-black text-[#f39c12] rounded-3xl hover:scale-105 transition-all">
-                            BELI SEKARANG
-                        </button>
+                            <button onclick="openBellyPassModal()" 
+                                    class="mt-10 w-full py-6 text-2xl font-bold bg-black text-[#f39c12] rounded-3xl hover:scale-105 transition-all">
+                                BUY NOW
+                            </button>
 
-                        <p class="text-xs text-black/60 mt-8">Setelah bayar, langsung link Telegram kamu</p>
+                            <p class="text-xs text-black/60 mt-8">After payment, link your Telegram account</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -533,42 +536,42 @@
     </div>
 
 
-    <!-- BELLY PASS MODAL -->
+    <!-- BELLY PASS MODAL - ENGLISH -->
     <div id="bellyPassModal" onclick="if(event.target.id === 'bellyPassModal') closeBellyPassModal()" 
         class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] px-4">
         <div onclick="event.stopImmediatePropagation()" 
             class="modal bg-[#1a1428] w-full max-w-lg mx-auto rounded-3xl overflow-hidden border border-[#f39c12]/30">
             
-            <div class="px-8 py-6 border-b border-white/10 flex justify-between">
-                <h2 class="text-2xl font-bold">Beli Belly Pass</h2>
-                <button onclick="closeBellyPassModal()" class="text-4xl text-gray-400 hover:text-white">×</button>
+            <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center">
+                <h2 class="text-2xl font-bold">Purchase Belly Pass</h2>
+                <button onclick="closeBellyPassModal()" class="text-4xl text-gray-400 hover:text-white leading-none">×</button>
             </div>
 
             <div class="p-8 space-y-8">
                 <div class="bg-[#2a2140] rounded-3xl p-6 text-center">
-                    <p class="text-sm text-gray-400">Harga</p>
+                    <p class="text-sm text-gray-400">Price</p>
                     <p class="text-6xl font-black text-[#f39c12]">2 PATHUSD</p>
-                    <p class="text-xs mt-2">Berlaku 30 hari • Semua power-up aktif</p>
+                    <p class="text-xs mt-2">Valid for 30 days • All power-ups included</p>
                 </div>
 
                 <div id="passStep1">
                     <button onclick="buyPassWithPathUSD()" 
                             class="w-full py-6 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-2xl rounded-3xl hover:scale-105 transition-all">
-                        BAYAR 2 PATHUSD
+                        PAY 2 PATHUSD
                     </button>
-                    <p class="text-center text-xs text-gray-400 mt-4">Menggunakan wallet TEMPO kamu</p>
+                    <p class="text-center text-xs text-gray-400 mt-4">Using your TEMPO wallet</p>
                 </div>
 
-                <!-- Step setelah payment sukses -->
+                <!-- Step 2: Link Telegram -->
                 <div id="passStep2" class="hidden">
-                    <h3 class="font-bold text-xl mb-4">Link Telegram Kamu</h3>
-                    <input id="passTgUsername" type="text" placeholder="@username" 
+                    <h3 class="font-bold text-xl mb-4">Link Your Telegram Account</h3>
+                    <input id="passTgUsername" type="text" placeholder="@yourusername" 
                         class="w-full bg-[#2a2140] px-6 py-5 rounded-3xl outline-none text-white text-lg">
                     <button onclick="linkTelegramAfterPayment()" 
-                            class="mt-6 w-full py-5 bg-white text-black font-bold rounded-3xl">
-                        KAITKAN AKUN TELEGRAM
+                            class="mt-6 w-full py-5 bg-white text-black font-bold rounded-3xl hover:bg-amber-300 transition-all">
+                        LINK TELEGRAM ACCOUNT
                     </button>
-                    <p class="text-xs text-center text-gray-400 mt-4">Pass akan aktif di game setelah ini</p>
+                    <p class="text-xs text-center text-gray-400 mt-4">Your pass will be active in the game after this</p>
                 </div>
             </div>
         </div>
