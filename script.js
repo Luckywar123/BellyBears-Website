@@ -37,13 +37,26 @@ async function setWalletContext() {
     }
 }
 
-// Helper untuk RLS dengan anon key
+// ================== SET WALLET CONTEXT UNTUK RLS ==================
 async function setWalletForRLS() {
     if (!userWalletAddress) return;
+
     try {
-        // Kita pakai raw query karena rpc kadang ribet
-        await supabaseClient.from('belly_passes').select('id').limit(1); // trigger context
-    } catch(e) {}
+        // Kirim wallet address ke Supabase session/context
+        const { error } = await supabaseClient.rpc('set_context', {
+            wallet: userWalletAddress
+        });
+
+        if (error) {
+            console.log("RPC set_context gagal, pakai fallback...");
+            // Fallback: pakai raw query untuk memicu context
+            await supabaseClient.from('belly_passes').select('id').eq('wallet_address', userWalletAddress).limit(1);
+        }
+
+        console.log("✅ Wallet context berhasil diset untuk RLS");
+    } catch (err) {
+        console.error("Gagal set wallet context:", err);
+    }
 }
 
 // ================== CONFETTI ==================
@@ -752,6 +765,7 @@ window.onload = async () => {
     await fetchLeaderboard();
     // Di dalam window.onload, paling bawah sebelum console.log READY
     document.getElementById('musicBtn').style.opacity = '0.85';
+    
     // === LOAD WALLET SESSION DULU ===
     const savedWallet = loadWalletSession();
     if (savedWallet) {
@@ -766,7 +780,7 @@ window.onload = async () => {
         }
     }
 
-    // === BARU JALANKAN CHECK MY PASS ===
+    await setWalletForRLS();
     checkMyPass();
 
     // Congrats kalau task selesai
