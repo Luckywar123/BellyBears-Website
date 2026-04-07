@@ -483,6 +483,7 @@ window.onload = async () => {
 
     initSupabase();
     await fetchLeaderboard();
+    checkMyPass();
 
     setInterval(() => {
         let countEl = document.getElementById('mintedCount');
@@ -493,74 +494,12 @@ window.onload = async () => {
     console.log('%c✅ Belly Bears WEBSITE READY!', 'color:#f39c12; font-size:15px; font-weight:bold');
 };
 
-// ================== BELLY PASS CONFIG ==================
-const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_KAMU_DISINI";   // ← GANTI
-const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_KAMU";         // ← GANTI (wallet yang terima PATHUSD)
-
-const PATHUSD_ABI = [
-    "function transfer(address to, uint256 amount) returns (bool)",
-    "function approve(address spender, uint256 amount) returns (bool)"
-];
-
-let currentPassTxHash = null;
-
-// ================== OPEN MODAL ==================
-function openBellyPassModal() {
-    document.getElementById('bellyPassModal').classList.remove('hidden');
-    document.getElementById('passStep1').classList.remove('hidden');
-    document.getElementById('passStep2').classList.add('hidden');
-}
-
-function closeBellyPassModal() {
-    document.getElementById('bellyPassModal').classList.add('hidden');
-}
-
-// ================== PAYMENT PATHUSD ==================
-async function buyPassWithPathUSD() {
-    if (!userWalletAddress) {
-        alert("⚠️ Connect wallet dulu!");
-        await connectWallet();
-        if (!userWalletAddress) return;
-    }
-
-    const btn = event.currentTarget;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Memproses...`;
-    btn.disabled = true;
-
-    try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-
-        const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
-
-        const amount = ethers.parseUnits("2", 18); // 2 PATHUSD (asumsi 18 decimals)
-
-        // Kirim langsung ke treasury
-        const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
-        await tx.wait();
-
-        currentPassTxHash = tx.hash;
-        console.log("✅ Payment sukses!", tx.hash);
-
-        // Tampilkan step link Telegram
-        document.getElementById('passStep1').classList.add('hidden');
-        document.getElementById('passStep2').classList.remove('hidden');
-
-        launchConfetti();
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Payment gagal atau dibatalkan.");
-        btn.innerHTML = `BAYAR 2 PATHUSD`;
-        btn.disabled = false;
-    }
-}
 
 // ================== BELLY PASS SYSTEM (ENGLISH) ==================
 // Letakkan di paling bawah script.js, sebelum window.onload
 
-const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_DISINI";   
-const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_DISINI"; 
+const PATHUSD_ADDRESS = "0x20c0000000000000000000000000000000000000";   
+const TREASURY_ADDRESS = "0xedf790A178cb47002309F28315c76155152b1EDb"; 
 
 const PATHUSD_ABI = [
     "function transfer(address to, uint256 amount) returns (bool)"
@@ -661,5 +600,44 @@ async function linkTelegramAfterPayment() {
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
+    }
+}
+
+// ================== MY PASS CHECK ==================
+async function checkMyPass() {
+    if (!userWalletAddress) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('belly_passes')
+            .select('*')
+            .eq('wallet_address', userWalletAddress)
+            .eq('active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        const card = document.getElementById('myPassCard');
+        const noPass = document.getElementById('noPassMessage');
+
+        if (error || !data) {
+            card.classList.add('hidden');
+            noPass.classList.remove('hidden');
+            return;
+        }
+
+        // Hitung sisa hari
+        const expiry = new Date(data.expiry_date);
+        const now = new Date();
+        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+
+        document.getElementById('passExpiry').textContent = `${daysLeft} days left`;
+        document.getElementById('telegramLinked').textContent = `Linked to: ${data.telegram_username || 'Not linked'}`;
+
+        card.classList.remove('hidden');
+        noPass.classList.add('hidden');
+
+    } catch (err) {
+        console.error("Error checking pass:", err);
     }
 }

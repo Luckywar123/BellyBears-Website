@@ -28,6 +28,7 @@
                 <a href="#team" class="hover:text-[#f39c12] transition-colors">Team</a>
                 <a href="#game" class="hover:text-[#f39c12] transition-colors">Play Game</a>
                 <a href="#bellypass" class="hover:text-[#f39c12] transition-colors font-bold text-[#f39c12]">Belly Pass</a>
+                <a href="#mypass" class="hover:text-[#f39c12] transition-colors font-medium">My Pass</a>
             </div>
 
             <div class="flex items-center gap-4">
@@ -372,6 +373,49 @@
             </div>
         </div>
     </section>
+
+
+    <!-- ================== MY PASS SECTION ================== -->
+    <section id="mypass" class="py-24 bg-[#0f172a]">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold">My Belly Pass</h2>
+                <p class="text-gray-400 mt-3">Check your active power-ups and expiration date</p>
+            </div>
+
+            <div id="myPassCard" class="bg-[#1e2937] rounded-3xl p-10 text-center hidden">
+                <div class="inline px-6 py-2 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-bold">ACTIVE</div>
+                <h3 class="text-3xl font-bold mt-6">Belly Pass - 1 Month</h3>
+                <p class="text-6xl font-black text-[#f39c12] mt-4" id="passExpiry">30 days left</p>
+                
+                <div class="grid grid-cols-3 gap-6 mt-10">
+                    <div class="bg-[#0f172a] p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">⚡</div>
+                        <p class="font-bold">Combo Master</p>
+                    </div>
+                    <div class="bg-[#0f172a] p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">🛡️</div>
+                        <p class="font-bold">Shield 3x</p>
+                    </div>
+                    <div class="bg-[#0f172a] p-6 rounded-2xl">
+                        <div class="text-4xl mb-2">🧲</div>
+                        <p class="font-bold">Coin Magnet</p>
+                    </div>
+                </div>
+
+                <p class="text-sm text-gray-400 mt-10" id="telegramLinked">Linked to: @username</p>
+            </div>
+
+            <div id="noPassMessage" class="text-center py-20">
+                <p class="text-2xl text-gray-400">You don't have an active Belly Pass yet.</p>
+                <button onclick="openBellyPassModal()" 
+                        class="mt-8 px-10 py-4 bg-[#f39c12] text-black font-bold rounded-3xl hover:scale-105 transition-all">
+                    BUY BELLY PASS NOW
+                </button>
+            </div>
+        </div>
+    </section>
+
 
 
     <!-- TEAM -->
