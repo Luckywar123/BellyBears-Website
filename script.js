@@ -432,7 +432,7 @@ async function saveMintToSupabase(telegram, bearNumber) {
 }
 
 async function performMint() {
-    const number = Math.floor(Math.random() * 777) + 1;
+    const number = Math.floor(Math.random() * 2222) + 1;
     const tgUsername = document.getElementById('tgUsername').value.trim();
 
     const btn = event.currentTarget;
