@@ -492,3 +492,177 @@ window.onload = async () => {
 
     console.log('%c✅ Belly Bears WEBSITE READY!', 'color:#f39c12; font-size:15px; font-weight:bold');
 };
+
+// ================== BELLY PASS CONFIG ==================
+const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_KAMU_DISINI";   // ← GANTI
+const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_KAMU";         // ← GANTI (wallet yang terima PATHUSD)
+
+const PATHUSD_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)",
+    "function approve(address spender, uint256 amount) returns (bool)"
+];
+
+let currentPassTxHash = null;
+
+// ================== OPEN MODAL ==================
+function openBellyPassModal() {
+    document.getElementById('bellyPassModal').classList.remove('hidden');
+    document.getElementById('passStep1').classList.remove('hidden');
+    document.getElementById('passStep2').classList.add('hidden');
+}
+
+function closeBellyPassModal() {
+    document.getElementById('bellyPassModal').classList.add('hidden');
+}
+
+// ================== PAYMENT PATHUSD ==================
+async function buyPassWithPathUSD() {
+    if (!userWalletAddress) {
+        alert("⚠️ Connect wallet dulu!");
+        await connectWallet();
+        if (!userWalletAddress) return;
+    }
+
+    const btn = event.currentTarget;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin"></i> Memproses...`;
+    btn.disabled = true;
+
+    try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
+
+        const amount = ethers.parseUnits("2", 18); // 2 PATHUSD (asumsi 18 decimals)
+
+        // Kirim langsung ke treasury
+        const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
+        await tx.wait();
+
+        currentPassTxHash = tx.hash;
+        console.log("✅ Payment sukses!", tx.hash);
+
+        // Tampilkan step link Telegram
+        document.getElementById('passStep1').classList.add('hidden');
+        document.getElementById('passStep2').classList.remove('hidden');
+
+        launchConfetti();
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Payment gagal atau dibatalkan.");
+        btn.innerHTML = `BAYAR 2 PATHUSD`;
+        btn.disabled = false;
+    }
+}
+
+// ================== BELLY PASS SYSTEM ==================
+// Tambahkan kode ini di paling bawah script.js (sebelum window.onload)
+
+const PATHUSD_ADDRESS = "0xMASUKKAN_ADDRESS_PATHUSD_DISINI";   // ← GANTI INI
+const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_DISINI"; // ← GANTI INI
+
+const PATHUSD_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)"
+];
+
+let currentPassTxHash = null;
+
+// ================== OPEN & CLOSE MODAL ==================
+function openBellyPassModal() {
+    const modal = document.getElementById('bellyPassModal');
+    if (!modal) return;
+    
+    modal.classList.remove('hidden');
+    document.getElementById('passStep1').classList.remove('hidden');
+    document.getElementById('passStep2').classList.add('hidden');
+}
+
+function closeBellyPassModal() {
+    const modal = document.getElementById('bellyPassModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// ================== BUY PASS WITH PATHUSD ==================
+async function buyPassWithPathUSD() {
+    if (!userWalletAddress) {
+        alert("⚠️ Harap connect wallet TEMPO terlebih dahulu!");
+        await connectWallet();
+        if (!userWalletAddress) return;
+    }
+
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Memproses pembayaran...`;
+    btn.disabled = true;
+
+    try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
+        const amount = ethers.parseUnits("2", 18); // 2 PATHUSD
+
+        const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
+        await tx.wait();
+
+        currentPassTxHash = tx.hash;
+
+        // Tampilkan step 2 (Link Telegram)
+        document.getElementById('passStep1').classList.add('hidden');
+        document.getElementById('passStep2').classList.remove('hidden');
+
+        launchConfetti();
+
+        console.log("✅ Payment Belly Pass berhasil:", tx.hash);
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Pembayaran dibatalkan atau gagal.\n\nPastikan saldo PATHUSD cukup dan jaringan TEMPO aktif.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ================== LINK TELEGRAM AFTER PAYMENT ==================
+async function linkTelegramAfterPayment() {
+    const usernameInput = document.getElementById('passTgUsername');
+    const username = usernameInput ? usernameInput.value.trim() : '';
+
+    if (!username || !username.startsWith('@')) {
+        alert("❌ Masukkan Telegram username dengan benar (contoh: @namauser)");
+        return;
+    }
+
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Menyimpan...`;
+    btn.disabled = true;
+
+    try {
+        const { error } = await supabaseClient.from('belly_passes').insert({
+            wallet_address: userWalletAddress,
+            telegram_username: username,
+            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 hari
+            power_ups: {
+                combo_master: true,
+                shield: 3,
+                coin_magnet: true
+            },
+            active: true
+        });
+
+        if (error) throw error;
+
+        alert(`🎉 Berhasil!\n\nBelly Pass 1 bulan telah aktif.\n\nPower-up akan langsung tersedia di game Telegram kamu.`);
+        closeBellyPassModal();
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Gagal menyimpan data Belly Pass. Silakan coba lagi.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}

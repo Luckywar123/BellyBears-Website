@@ -178,3 +178,8 @@ html {
     50% { transform: scale(1.12); }
     100% { transform: scale(1); }
 }
+
+/* Belly Pass */
+#bellypass .text-7xl {
+    text-shadow: 0 0 30px rgba(243, 156, 18, 0.6);
+}
