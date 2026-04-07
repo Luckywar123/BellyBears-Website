@@ -27,6 +27,25 @@ function initSupabase() {
     }
 }
 
+
+// Set wallet ke Supabase context agar RLS bisa baca
+async function setWalletContext() {
+    if (userWalletAddress) {
+        await supabaseClient.rpc('set_context', { 
+            wallet: userWalletAddress 
+        }).catch(() => {});
+    }
+}
+
+// Helper untuk RLS dengan anon key
+async function setWalletForRLS() {
+    if (!userWalletAddress) return;
+    try {
+        // Kita pakai raw query karena rpc kadang ribet
+        await supabaseClient.from('belly_passes').select('id').limit(1); // trigger context
+    } catch(e) {}
+}
+
 // ================== CONFETTI ==================
 function launchConfetti() {
     const canvas = document.createElement('canvas');
@@ -620,7 +639,7 @@ async function linkTelegramAfterPayment() {
                 combo_master: true, 
                 shield: 3, 
                 coin_magnet: true 
-                // ← nanti bisa diubah dari variabel atau dari input admin
+                
             },
             active: true
         });
