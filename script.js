@@ -393,6 +393,9 @@ async function connectWalletInModal() {
         `;
         if (currentStep === 2) nextStep();
     }
+    if (userWalletAddress) {
+    console.log("✅ Wallet sudah terhubung:", userWalletAddress);
+}
 }
 
 // ================== SAVE MINT & PERFORM MINT ==================
@@ -569,8 +572,8 @@ async function buyPassWithPathUSD() {
 
         const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
         
-        // pathUSD di Tempo pakai 6 decimals
-        const amount = ethers.parseUnits("0", 6);
+        // pathUSD di Tempo pakai 18 decimals
+        const amount = ethers.parseUnits("0", 18); // 2 PATHUSD = 2 * 10^18 (sesuaikan dengan decimals token)
 
         const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
         await tx.wait();
@@ -612,7 +615,12 @@ async function linkTelegramAfterPayment() {
             wallet_address: userWalletAddress,
             telegram_username: username,
             expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            power_ups: { combo_master: true, shield: 3, coin_magnet: true },
+            power_ups: { 
+                combo_master: true, 
+                shield: 3, 
+                coin_magnet: true 
+                // ← nanti bisa diubah dari variabel atau dari input admin
+            },
             active: true
         });
 
