@@ -570,7 +570,7 @@ async function buyPassWithPathUSD() {
         const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
         
         // pathUSD di Tempo pakai 6 decimals
-        const amount = ethers.parseUnits("2", 6);
+        const amount = ethers.parseUnits("0", 6);
 
         const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
         await tx.wait();
