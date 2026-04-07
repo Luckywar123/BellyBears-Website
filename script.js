@@ -499,7 +499,7 @@ window.onload = async () => {
 // Letakkan di paling bawah script.js, sebelum window.onload
 
 const PATHUSD_ADDRESS = "0x20c0000000000000000000000000000000000000";   
-const TREASURY_ADDRESS = "0xMASUKKAN_TREASURY_WALLET_DISINI"; 
+const TREASURY_ADDRESS = "0xedf790A178cb47002309F28315c76155152b1EDb"; 
 
 const PATHUSD_ABI = [
     "function transfer(address to, uint256 amount) returns (bool)"
