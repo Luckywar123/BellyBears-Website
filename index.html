@@ -634,10 +634,17 @@
     
     <script src="script.js"></script>
 
-    <audio id="bgMusic" loop>
-        <source src="Assets/bgm-web.m4a" type="audio/mp4a">
+    <!-- AUDIO + MUSIC BUTTON -->
+    <audio id="bgMusic" loop preload="none">
+        <source src="Assets/bgm-web.m4a" type="audio/mp4">
+        Your browser does not support the audio element.
     </audio>
-    <button onclick="toggleMusic()" class="fixed bottom-6 right-6 bg-[#f39c12] text-black p-4 rounded-full shadow-xl">🎵</button>
+
+    <button onclick="toggleMusic()" 
+            id="musicBtn"
+            class="fixed bottom-6 right-6 bg-[#f39c12] hover:bg-amber-400 text-black p-4 rounded-full shadow-2xl transition-all z-50 flex items-center justify-center w-14 h-14">
+        🎵
+    </button>
 
 </body>
 </html>

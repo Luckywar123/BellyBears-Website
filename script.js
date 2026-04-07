@@ -699,9 +699,27 @@ function logoutWallet() {
 }
 
 
+let isMusicPlaying = false;
+
 function toggleMusic() {
     const audio = document.getElementById('bgMusic');
-    audio.paused ? audio.play() : audio.pause();
+    const btn = document.getElementById('musicBtn');
+
+    if (audio.paused) {
+        audio.play().then(() => {
+            isMusicPlaying = true;
+            btn.innerHTML = '⏸️';
+            btn.classList.add('bg-emerald-400');
+        }).catch(err => {
+            console.log("Autoplay prevented:", err);
+            alert("Klik tombol musik sekali lagi untuk memutar lagu 🎵");
+        });
+    } else {
+        audio.pause();
+        isMusicPlaying = false;
+        btn.innerHTML = '🎵';
+        btn.classList.remove('bg-emerald-400');
+    }
 }
 
 
@@ -713,7 +731,8 @@ window.onload = async () => {
 
     initSupabase();
     await fetchLeaderboard();
-
+    // Di dalam window.onload, paling bawah sebelum console.log READY
+    document.getElementById('musicBtn').style.opacity = '0.85';
     // === LOAD WALLET SESSION DULU ===
     const savedWallet = loadWalletSession();
     if (savedWallet) {
