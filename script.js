@@ -475,6 +475,203 @@ function toggleMobileMenu() {
     menu.classList.toggle('hidden');
 }
 
+// ================== BELLY PASS SYSTEM (FINAL FIXED - 7 April 2026) ==================
+// Letakkan di paling bawah script.js
+
+const PATHUSD_ADDRESS = "0x20c0000000000000000000000000000000000000";   
+const TREASURY_ADDRESS = "0xedf790A178cb47002309F28315c76155152b1EDb"; 
+
+const PATHUSD_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)"
+];
+
+const TEMPO_CHAIN_ID = 4217;
+const TEMPO_RPC = "https://rpc.tempo.xyz";
+const TEMPO_EXPLORER = "https://explore.mainnet.tempo.xyz";
+
+let currentPassTxHash = null;
+
+// ================== AUTO SWITCH KE TEMPO ==================
+async function switchToTempo() {
+    if (!window.ethereum) return false;
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x' + TEMPO_CHAIN_ID.toString(16) }],
+        });
+        return true;
+    } catch (switchError) {
+        if (switchError.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x' + TEMPO_CHAIN_ID.toString(16),
+                        chainName: 'Tempo Mainnet',
+                        rpcUrls: [TEMPO_RPC],
+                        blockExplorerUrls: [TEMPO_EXPLORER],
+                        nativeCurrency: { name: 'PATHUSD', symbol: 'USD', decimals: 18 }
+                    }]
+                });
+                return true;
+            } catch (addError) {
+                console.error("Gagal tambah Tempo network:", addError);
+                return false;
+            }
+        }
+        return false;
+    }
+}
+
+// Open & Close Modal
+function openBellyPassModal() {
+    const modal = document.getElementById('bellyPassModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    document.getElementById('passStep1').classList.remove('hidden');
+    document.getElementById('passStep2').classList.add('hidden');
+}
+
+function closeBellyPassModal() {
+    const modal = document.getElementById('bellyPassModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+// ================== BUY PASS (SUDAH DI-FIX) ==================
+async function buyPassWithPathUSD() {
+    const btn = event ? event.currentTarget : null;
+    const originalText = btn ? btn.innerHTML : 'PAY 2 PATHUSD';
+
+    if (!userWalletAddress) {
+        alert("⚠️ Connect wallet dulu!");
+        await connectWallet();
+        if (!userWalletAddress) return;
+    }
+
+    // Auto switch network
+    const currentChain = await window.ethereum.request({ method: 'eth_chainId' });
+    if (parseInt(currentChain, 16) !== TEMPO_CHAIN_ID) {
+        const switched = await switchToTempo();
+        if (!switched) {
+            alert("❌ Harus di jaringan Tempo Mainnet (Chain ID 4217)!");
+            return;
+        }
+    }
+
+    if (btn) {
+        btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Processing...`;
+        btn.disabled = true;
+    }
+
+    try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const signer = await provider.getSigner();
+
+        const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
+        
+        // pathUSD di Tempo pakai 6 decimals
+        const amount = ethers.parseUnits("2", 6);
+
+        const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
+        await tx.wait();
+
+        currentPassTxHash = tx.hash;
+
+        document.getElementById('passStep1').classList.add('hidden');
+        document.getElementById('passStep2').classList.remove('hidden');
+
+        launchConfetti();
+        console.log("✅ Payment sukses! Tx Hash:", tx.hash);
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Payment gagal.\n\nPastikan:\n1. Wallet sudah di Tempo Mainnet\n2. Balance PATHUSD minimal 2\n3. Konfirmasi di MetaMask");
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+}
+
+// Link Telegram setelah payment
+async function linkTelegramAfterPayment() {
+    const username = document.getElementById('passTgUsername').value.trim();
+    if (!username || !username.startsWith('@')) {
+        alert("❌ Masukkan Telegram username yang valid (@username)");
+        return;
+    }
+
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Saving...`;
+    btn.disabled = true;
+
+    try {
+        const { error } = await supabaseClient.from('belly_passes').insert({
+            wallet_address: userWalletAddress,
+            telegram_username: username,
+            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            power_ups: { combo_master: true, shield: 3, coin_magnet: true },
+            active: true
+        });
+
+        if (error) throw error;
+
+        alert(`🎉 Success!\n\nBelly Pass kamu aktif selama 30 hari.\nPower-up sudah siap di Telegram Game!`);
+        closeBellyPassModal();
+
+    } catch (err) {
+        console.error(err);
+        alert("❌ Gagal menyimpan data pass. Coba lagi.");
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+// ================== CHECK MY PASS ==================
+async function checkMyPass() {
+    if (!userWalletAddress) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('belly_passes')
+            .select('*')
+            .eq('wallet_address', userWalletAddress)
+            .eq('active', true)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+        const card = document.getElementById('myPassCard');
+        const noPass = document.getElementById('noPassMessage');
+
+        if (error || !data) {
+            if (card) card.classList.add('hidden');
+            if (noPass) noPass.classList.remove('hidden');
+            return;
+        }
+
+        const expiry = new Date(data.expiry_date);
+        const now = new Date();
+        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+
+        if (document.getElementById('passExpiry')) 
+            document.getElementById('passExpiry').textContent = `${daysLeft} days left`;
+        
+        if (document.getElementById('telegramLinked')) 
+            document.getElementById('telegramLinked').textContent = `Linked to: ${data.telegram_username || 'Not linked'}`;
+
+        if (card) card.classList.remove('hidden');
+        if (noPass) noPass.classList.add('hidden');
+
+    } catch (err) {
+        console.error("Error checkMyPass:", err);
+    }
+}
+
+
 // ================== INITIALIZE ==================
 window.onload = async () => {
     loadTasks();
@@ -495,156 +692,3 @@ window.onload = async () => {
 };
 
 
-// ================== BELLY PASS SYSTEM (UPDATED + AUTO SWITCH TEMPO) ==================
-// Letakkan di paling bawah script.js, sebelum window.onload
-
-const PATHUSD_ADDRESS = "0x20c0000000000000000000000000000000000000";   
-const TREASURY_ADDRESS = "0xedf790A178cb47002309F28315c76155152b1EDb"; 
-
-const PATHUSD_ABI = [
-    "function transfer(address to, uint256 amount) returns (bool)"
-];
-
-const TEMPO_CHAIN_ID = 4217;
-const TEMPO_RPC = "https://rpc.tempo.xyz";           // RPC resmi Tempo
-const TEMPO_EXPLORER = "https://explore.mainnet.tempo.xyz";
-
-let currentPassTxHash = null;
-
-// ================== AUTO SWITCH KE TEMPO ==================
-async function switchToTempo() {
-    if (!window.ethereum) return false;
-
-    try {
-        await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x' + TEMPO_CHAIN_ID.toString(16) }],
-        });
-        return true;
-    } catch (switchError) {
-        if (switchError.code === 4902) { // network belum ada
-            try {
-                await window.ethereum.request({
-                    method: 'wallet_addEthereumChain',
-                    params: [{
-                        chainId: '0x' + TEMPO_CHAIN_ID.toString(16),
-                        chainName: 'Tempo Mainnet',
-                        rpcUrls: [TEMPO_RPC],
-                        blockExplorerUrls: [TEMPO_EXPLORER],
-                        nativeCurrency: { name: 'PATHUSD', symbol: 'USD', decimals: 18 }
-                    }]
-                });
-                return true;
-            } catch (addError) {
-                console.error("Gagal tambah Tempo network:", addError);
-                return false;
-            }
-        }
-        console.error("Gagal switch network:", switchError);
-        return false;
-    }
-}
-
-// Open Modal
-function openBellyPassModal() {
-    const modal = document.getElementById('bellyPassModal');
-    if (!modal) return;
-    
-    modal.classList.remove('hidden');
-    document.getElementById('passStep1').classList.remove('hidden');
-    document.getElementById('passStep2').classList.add('hidden');
-}
-
-function closeBellyPassModal() {
-    const modal = document.getElementById('bellyPassModal');
-    if (modal) modal.classList.add('hidden');
-}
-
-// Buy Pass (SUDAH DI-FIX)
-async function buyPassWithPathUSD() {
-    if (!userWalletAddress) {
-        alert("⚠️ Connect wallet dulu!");
-        await connectWallet();
-        if (!userWalletAddress) return;
-    }
-
-    // AUTO SWITCH KE TEMPO
-    const currentChain = await window.ethereum.request({ method: 'eth_chainId' });
-    if (parseInt(currentChain, 16) !== TEMPO_CHAIN_ID) {
-        const switched = await switchToTempo();
-        if (!switched) {
-            alert("❌ Harus di jaringan Tempo Mainnet (Chain ID 4217)!\n\nMetaMask akan otomatis switch sekarang.");
-            return;
-        }
-    }
-
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Processing payment...`;
-    btn.disabled = true;
-
-    try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const signer = await provider.getSigner();
-
-        const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
-        
-        // 🔥 PENTING: pathUSD di Tempo pakai 6 decimals, bukan 18!
-        const amount = ethers.parseUnits("2", 6);
-
-        const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
-        await tx.wait();
-
-        currentPassTxHash = tx.hash;
-
-        document.getElementById('passStep1').classList.add('hidden');
-        document.getElementById('passStep2').classList.remove('hidden');
-
-        launchConfetti();
-        console.log("✅ Belly Pass payment successful:", tx.hash);
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Payment gagal.\nPastikan:\n1. Sudah di jaringan Tempo\n2. Balance PATHUSD cukup (minimal 2)\n3. Bukan AnimeChain");
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
-
-// Link Telegram (tetap sama)
-async function linkTelegramAfterPayment() {
-    const username = document.getElementById('passTgUsername').value.trim();
-
-    if (!username || !username.startsWith('@')) {
-        alert("❌ Please enter a valid Telegram username (e.g. @yourname)");
-        return;
-    }
-
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = `<i class="fas fa-spinner animate-spin mr-2"></i> Saving...`;
-    btn.disabled = true;
-
-    try {
-        const { error } = await supabaseClient.from('belly_passes').insert({
-            wallet_address: userWalletAddress,
-            telegram_username: username,
-            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            power_ups: { combo_master: true, shield: 3, coin_magnet: true },
-            active: true
-        });
-
-        if (error) throw error;
-
-        alert(`🎉 Success!\n\nYour 1-month Belly Pass has been activated.\n\nPower-ups are now ready in the Telegram game!`);
-        closeBellyPassModal();
-
-    } catch (err) {
-        console.error(err);
-        alert("❌ Failed to save pass data. Please try again.");
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-}
