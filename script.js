@@ -495,7 +495,7 @@ window.onload = async () => {
 };
 
 
-// ================== BELLY PASS SYSTEM (ENGLISH) ==================
+// ================== BELLY PASS SYSTEM (UPDATED + AUTO SWITCH TEMPO) ==================
 // Letakkan di paling bawah script.js, sebelum window.onload
 
 const PATHUSD_ADDRESS = "0x20c0000000000000000000000000000000000000";   
@@ -505,7 +505,45 @@ const PATHUSD_ABI = [
     "function transfer(address to, uint256 amount) returns (bool)"
 ];
 
+const TEMPO_CHAIN_ID = 4217;
+const TEMPO_RPC = "https://rpc.tempo.xyz";           // RPC resmi Tempo
+const TEMPO_EXPLORER = "https://explore.mainnet.tempo.xyz";
+
 let currentPassTxHash = null;
+
+// ================== AUTO SWITCH KE TEMPO ==================
+async function switchToTempo() {
+    if (!window.ethereum) return false;
+
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x' + TEMPO_CHAIN_ID.toString(16) }],
+        });
+        return true;
+    } catch (switchError) {
+        if (switchError.code === 4902) { // network belum ada
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [{
+                        chainId: '0x' + TEMPO_CHAIN_ID.toString(16),
+                        chainName: 'Tempo Mainnet',
+                        rpcUrls: [TEMPO_RPC],
+                        blockExplorerUrls: [TEMPO_EXPLORER],
+                        nativeCurrency: { name: 'PATHUSD', symbol: 'USD', decimals: 18 }
+                    }]
+                });
+                return true;
+            } catch (addError) {
+                console.error("Gagal tambah Tempo network:", addError);
+                return false;
+            }
+        }
+        console.error("Gagal switch network:", switchError);
+        return false;
+    }
+}
 
 // Open Modal
 function openBellyPassModal() {
@@ -522,12 +560,22 @@ function closeBellyPassModal() {
     if (modal) modal.classList.add('hidden');
 }
 
-// Buy Pass
+// Buy Pass (SUDAH DI-FIX)
 async function buyPassWithPathUSD() {
     if (!userWalletAddress) {
-        alert("⚠️ Please connect your TEMPO wallet first!");
+        alert("⚠️ Connect wallet dulu!");
         await connectWallet();
         if (!userWalletAddress) return;
+    }
+
+    // AUTO SWITCH KE TEMPO
+    const currentChain = await window.ethereum.request({ method: 'eth_chainId' });
+    if (parseInt(currentChain, 16) !== TEMPO_CHAIN_ID) {
+        const switched = await switchToTempo();
+        if (!switched) {
+            alert("❌ Harus di jaringan Tempo Mainnet (Chain ID 4217)!\n\nMetaMask akan otomatis switch sekarang.");
+            return;
+        }
     }
 
     const btn = event.currentTarget;
@@ -540,7 +588,9 @@ async function buyPassWithPathUSD() {
         const signer = await provider.getSigner();
 
         const pathUsdContract = new ethers.Contract(PATHUSD_ADDRESS, PATHUSD_ABI, signer);
-        const amount = ethers.parseUnits("2", 18);
+        
+        // 🔥 PENTING: pathUSD di Tempo pakai 6 decimals, bukan 18!
+        const amount = ethers.parseUnits("2", 6);
 
         const tx = await pathUsdContract.transfer(TREASURY_ADDRESS, amount);
         await tx.wait();
@@ -555,14 +605,14 @@ async function buyPassWithPathUSD() {
 
     } catch (err) {
         console.error(err);
-        alert("❌ Payment failed or cancelled.\nMake sure you have enough PATHUSD and are on the TEMPO network.");
+        alert("❌ Payment gagal.\nPastikan:\n1. Sudah di jaringan Tempo\n2. Balance PATHUSD cukup (minimal 2)\n3. Bukan AnimeChain");
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// Link Telegram
+// Link Telegram (tetap sama)
 async function linkTelegramAfterPayment() {
     const username = document.getElementById('passTgUsername').value.trim();
 
@@ -581,11 +631,7 @@ async function linkTelegramAfterPayment() {
             wallet_address: userWalletAddress,
             telegram_username: username,
             expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-            power_ups: {
-                combo_master: true,
-                shield: 3,
-                coin_magnet: true
-            },
+            power_ups: { combo_master: true, shield: 3, coin_magnet: true },
             active: true
         });
 
@@ -600,44 +646,5 @@ async function linkTelegramAfterPayment() {
     } finally {
         btn.innerHTML = originalText;
         btn.disabled = false;
-    }
-}
-
-// ================== MY PASS CHECK ==================
-async function checkMyPass() {
-    if (!userWalletAddress) return;
-
-    try {
-        const { data, error } = await supabaseClient
-            .from('belly_passes')
-            .select('*')
-            .eq('wallet_address', userWalletAddress)
-            .eq('active', true)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-        const card = document.getElementById('myPassCard');
-        const noPass = document.getElementById('noPassMessage');
-
-        if (error || !data) {
-            card.classList.add('hidden');
-            noPass.classList.remove('hidden');
-            return;
-        }
-
-        // Hitung sisa hari
-        const expiry = new Date(data.expiry_date);
-        const now = new Date();
-        const daysLeft = Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
-
-        document.getElementById('passExpiry').textContent = `${daysLeft} days left`;
-        document.getElementById('telegramLinked').textContent = `Linked to: ${data.telegram_username || 'Not linked'}`;
-
-        card.classList.remove('hidden');
-        noPass.classList.add('hidden');
-
-    } catch (err) {
-        console.error("Error checking pass:", err);
     }
 }
