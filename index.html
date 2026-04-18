@@ -49,8 +49,8 @@
         </ul>
 
         <div class="nav-actions">
-            <a href="https://x.com/belly_bears" target="_blank" class="nav-social">𝕏</a>
-            <a href="https://t.me/bellybears_bot" target="_blank" class="btn-telegram">
+            <a href="https://x.com/belly_bears" target="_blank" rel="noopener" class="nav-social">𝕏</a>
+            <a href="https://t.me/bellybears_bot" target="_blank" rel="noopener" class="btn-telegram">
                 <i class="fab fa-telegram"></i> Play Game
             </a>
             <button id="connectBtn" onclick="openWalletModal()" class="btn-wallet">
@@ -81,15 +81,10 @@
      HERO
 ══════════════════════════════════════════════ -->
 <section class="hero" id="home">
-    <!-- Particle field -->
     <div class="hero-particles" id="heroParticles"></div>
-
-    <!-- Forest parallax layers -->
     <div class="forest-layer forest-back"></div>
     <div class="forest-layer forest-mid"></div>
     <div class="forest-layer forest-front"></div>
-
-    <!-- Fireflies -->
     <div class="fireflies" id="fireflies"></div>
 
     <div class="hero-content">
@@ -111,13 +106,13 @@
                     <span>Join Whitelist</span>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
-                <a href="https://t.me/bellybears_bot" target="_blank" class="btn-outline">
+                <a href="https://t.me/bellybears_bot" target="_blank" rel="noopener" class="btn-outline">
                     <i class="fab fa-telegram"></i> Play Game
                 </a>
             </div>
             <div class="hero-stats reveal-up delay-4">
                 <div class="hero-stat">
-                    <span class="stat-num" id="mintedHero">291</span>
+                    <span class="stat-num" id="mintedHero">—</span>
                     <span class="stat-label">Minted</span>
                 </div>
                 <div class="stat-divider"></div>
@@ -134,12 +129,10 @@
         </div>
 
         <div class="hero-visual reveal-right delay-2">
-            <!-- Animated honey glow rings -->
             <div class="bear-ring bear-ring-1"></div>
             <div class="bear-ring bear-ring-2"></div>
             <div class="bear-ring bear-ring-3"></div>
             <img src="Assets/Main-Bear.png" alt="Belly Bear" class="hero-bear">
-            <!-- Floating honey drops -->
             <div class="honey-drop h1"></div>
             <div class="honey-drop h2"></div>
             <div class="honey-drop h3"></div>
@@ -147,7 +140,6 @@
         </div>
     </div>
 
-    <!-- Scroll indicator -->
     <div class="scroll-indicator">
         <div class="scroll-line"></div>
         <span>Scroll</span>
@@ -155,52 +147,30 @@
 </section>
 
 <!-- ═══════════════════════════════════════════
-     BEARS UNIVERSE (replaces Mint section)
+     BEARS UNIVERSE
 ══════════════════════════════════════════════ -->
 <section id="universe" class="universe-section">
-
-    <!-- Animated forest scene -->
     <div class="universe-scene">
-        <!-- Stars -->
         <div class="stars-layer" id="starsLayer"></div>
-
-        <!-- Moon -->
-        <div class="moon">
-            <div class="moon-glow"></div>
-        </div>
-
-        <!-- Trees silhouettes (CSS drawn) -->
+        <div class="moon"><div class="moon-glow"></div></div>
         <div class="trees-back">
-            <div class="tree t1"></div>
-            <div class="tree t2"></div>
-            <div class="tree t3"></div>
-            <div class="tree t4"></div>
-            <div class="tree t5"></div>
-            <div class="tree t6"></div>
+            <div class="tree t1"></div><div class="tree t2"></div>
+            <div class="tree t3"></div><div class="tree t4"></div>
+            <div class="tree t5"></div><div class="tree t6"></div>
             <div class="tree t7"></div>
         </div>
         <div class="trees-front">
-            <div class="tree tf1"></div>
-            <div class="tree tf2"></div>
-            <div class="tree tf3"></div>
-            <div class="tree tf4"></div>
+            <div class="tree tf1"></div><div class="tree tf2"></div>
+            <div class="tree tf3"></div><div class="tree tf4"></div>
         </div>
-
-        <!-- Ground glow -->
         <div class="ground-mist"></div>
-
-        <!-- Floating leaves -->
         <div class="leaves-container" id="leavesContainer"></div>
-
-        <!-- Bears walking/idle -->
         <div class="bears-scene">
-            <div class="scene-bear bear-walk" style="left:10%;animation-delay:0s;">🐻</div>
-            <div class="scene-bear bear-idle" style="left:35%;animation-delay:1.2s;">🐻</div>
+            <div class="scene-bear bear-walk"   style="left:10%;animation-delay:0s;">🐻</div>
+            <div class="scene-bear bear-idle"   style="left:35%;animation-delay:1.2s;">🐻</div>
             <div class="scene-bear bear-walk-r" style="left:60%;animation-delay:2.5s;">🐻</div>
-            <div class="scene-bear bear-idle" style="left:82%;animation-delay:0.8s;">🐻</div>
+            <div class="scene-bear bear-idle"   style="left:82%;animation-delay:0.8s;">🐻</div>
         </div>
-
-        <!-- Honey jars floating -->
         <div class="floaters">
             <div class="floater" style="left:15%;top:30%;animation-delay:0s;">🍯</div>
             <div class="floater" style="left:45%;top:20%;animation-delay:1.5s;">🍯</div>
@@ -210,7 +180,6 @@
         </div>
     </div>
 
-    <!-- Content overlay -->
     <div class="universe-content">
         <div class="universe-header">
             <h2 class="section-title reveal-up">The Belly Bears Universe</h2>
@@ -220,7 +189,6 @@
             </p>
         </div>
 
-        <!-- Mint Stats Card -->
         <div class="mint-stats-card reveal-up delay-2">
             <div class="mint-card-left">
                 <div class="mint-badge">🔥 WHITELIST LIVE</div>
@@ -229,11 +197,11 @@
 
                 <div class="mint-progress-wrap">
                     <div class="mint-progress-labels">
-                        <span><span id="mintedUniverse">291</span> / 2222 minted</span>
+                        <span><span id="mintedUniverse">—</span> / 2222 minted</span>
                         <span>46 WL spots left</span>
                     </div>
                     <div class="mint-progress-bar">
-                        <div class="mint-progress-fill" style="width:13%"></div>
+                        <div class="mint-progress-fill" style="width:0%"></div>
                     </div>
                 </div>
 
@@ -260,7 +228,7 @@
                 </div>
                 <div class="wl-status-box">
                     <span class="wl-status-label">Your WL Status</span>
-                    <span id="wlStatus" class="wl-status-val">✅ Eligible</span>
+                    <span id="wlStatus" class="wl-status-val">⏳ 0/4 tasks done</span>
                     <div onclick="openMintModal()" class="wl-cta">Check tasks → Claim spot</div>
                 </div>
             </div>
@@ -278,7 +246,6 @@
             <p class="section-sub reveal-up delay-1">Finish these missions to unlock early WL + extra in-game rewards</p>
         </div>
 
-        <!-- Progress Ring -->
         <div class="progress-ring-wrap reveal-up delay-2">
             <svg class="progress-svg" viewBox="0 0 120 120">
                 <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
@@ -409,7 +376,7 @@
                 </p>
 
                 <div class="game-actions reveal-up delay-3">
-                    <a href="https://t.me/bellybears_bot" target="_blank" class="game-btn-tg">
+                    <a href="https://t.me/bellybears_bot" target="_blank" rel="noopener" class="game-btn-tg">
                         <i class="fab fa-telegram"></i>
                         <div>
                             <span class="game-btn-label">Open in Telegram</span>
@@ -419,22 +386,10 @@
                 </div>
 
                 <div class="game-features reveal-up delay-4">
-                    <div class="game-feat">
-                        <span class="feat-icon">🏆</span>
-                        <span>Daily Leaderboard</span>
-                    </div>
-                    <div class="game-feat">
-                        <span class="feat-icon">🎟️</span>
-                        <span>WL Rewards</span>
-                    </div>
-                    <div class="game-feat">
-                        <span class="feat-icon">⚡</span>
-                        <span>Power-ups</span>
-                    </div>
-                    <div class="game-feat">
-                        <span class="feat-icon">🛡️</span>
-                        <span>Belly Pass Boost</span>
-                    </div>
+                    <div class="game-feat"><span class="feat-icon">🏆</span><span>Daily Leaderboard</span></div>
+                    <div class="game-feat"><span class="feat-icon">🎟️</span><span>WL Rewards</span></div>
+                    <div class="game-feat"><span class="feat-icon">⚡</span><span>Power-ups</span></div>
+                    <div class="game-feat"><span class="feat-icon">🛡️</span><span>Belly Pass Boost</span></div>
                 </div>
             </div>
 
@@ -455,7 +410,6 @@
      BELLY PASS
 ══════════════════════════════════════════════ -->
 <section id="bellypass" class="bellypass-section">
-    <!-- Animated honey bg -->
     <div class="honey-bg">
         <div class="hb-cell hb1"></div>
         <div class="hb-cell hb2"></div>
@@ -469,7 +423,6 @@
         </div>
 
         <div class="bp-grid">
-            <!-- Power-up cards -->
             <div class="bp-powers reveal-up delay-1">
                 <div class="power-card pc-combo">
                     <div class="power-icon">⚡</div>
@@ -491,7 +444,6 @@
                 </div>
             </div>
 
-            <!-- Buy card -->
             <div class="bp-buy-wrap reveal-up delay-2">
                 <div class="bp-buy-card">
                     <div class="bp-card-glow"></div>
@@ -501,14 +453,12 @@
                         <span class="bp-price-unit">USDC</span>
                     </div>
                     <p class="bp-price-note">Special launch price on Base</p>
-
                     <div class="bp-features-list">
                         <div class="bp-feat-item">✅ All 3 power-ups active</div>
                         <div class="bp-feat-item">✅ Linked to your Telegram</div>
                         <div class="bp-feat-item">✅ Instant activation</div>
                         <div class="bp-feat-item">✅ Pay with USDC on Base</div>
                     </div>
-
                     <button onclick="openBellyPassModal()" class="bp-buy-btn">
                         <span>Buy Now — 2 USDC</span>
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -604,7 +554,7 @@
             </details>
             <details class="faq-item reveal-up">
                 <summary>How to contact the team?</summary>
-                <p>Join our Telegram: <a href="https://t.me/bellybears_bot" target="_blank">t.me/bellybears_bot</a> or find us on X: <a href="https://x.com/belly_bears" target="_blank">@belly_bears</a></p>
+                <p>Join our Telegram: <a href="https://t.me/bellybears_bot" target="_blank" rel="noopener">t.me/bellybears_bot</a> or find us on X: <a href="https://x.com/belly_bears" target="_blank" rel="noopener">@belly_bears</a></p>
             </details>
         </div>
     </div>
@@ -622,8 +572,8 @@
             <p class="footer-tagline">2222 Legendary Chubby Bears on Base</p>
         </div>
         <div class="footer-links">
-            <a href="https://x.com/belly_bears" target="_blank" class="footer-link">𝕏 Twitter</a>
-            <a href="https://t.me/bellybears_bot" target="_blank" class="footer-link">📱 Telegram</a>
+            <a href="https://x.com/belly_bears" target="_blank" rel="noopener" class="footer-link">𝕏 Twitter</a>
+            <a href="https://t.me/bellybears_bot" target="_blank" rel="noopener" class="footer-link">📱 Telegram</a>
             <a href="https://belly-bears.xyz" class="footer-link">🌐 Website</a>
         </div>
     </div>
@@ -696,7 +646,7 @@
             <button class="modal-close" onclick="closeMintModal()">✕</button>
         </div>
 
-        <!-- Steps -->
+        <!-- Steps indicator -->
         <div class="modal-steps">
             <div class="step-pill" id="step1pill">1</div>
             <div class="step-connector"></div>
@@ -705,10 +655,11 @@
             <div class="step-pill step-inactive" id="step3pill">3</div>
         </div>
 
-        <!-- Step 1 -->
+        <!-- Step 1: Tasks -->
         <div id="stepContent1">
             <h3 class="modal-step-title">Step 1: Complete Tasks</h3>
             <div id="modalTasksList" class="modal-tasks"></div>
+
             <div class="modal-game-wl">
                 <div class="game-wl-info">
                     <span class="game-wl-icon">🎮</span>
@@ -719,16 +670,19 @@
                 </div>
                 <button onclick="claimGameWL()" class="btn-sm-amber">Claim WL</button>
             </div>
+
             <div class="modal-tg-input">
                 <label>Telegram Username (required)</label>
                 <input id="tgUsername" type="text" placeholder="@yourusername" class="modal-input">
             </div>
+
             <button onclick="submitTasksAndContinue()" class="btn-primary btn-full">
-                Save & Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                Save & Continue
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </button>
         </div>
 
-        <!-- Step 2 -->
+        <!-- Step 2: Connect Wallet -->
         <div id="stepContent2" class="hidden">
             <h3 class="modal-step-title">Step 2: Connect Wallet</h3>
             <div class="connect-wallet-box">
@@ -737,10 +691,12 @@
                 <button onclick="openWalletModal()" class="btn-primary">Connect Wallet</button>
                 <div id="walletAddressDisplay" class="wallet-addr-display"></div>
             </div>
-            <button onclick="nextStep()" class="btn-primary btn-full" style="margin-top:16px;">Next →</button>
+            <button onclick="nextStep()" class="btn-primary btn-full" style="margin-top:16px;">
+                Next →
+            </button>
         </div>
 
-        <!-- Step 3 -->
+        <!-- Step 3: Confirm -->
         <div id="stepContent3" class="hidden">
             <h3 class="modal-step-title">Step 3: Secure Your Spot</h3>
             <div class="mint-confirm">
@@ -749,10 +705,12 @@
                 <p>Mint Price: <strong style="color:var(--amber);">0.5 ETH</strong></p>
                 <p class="mint-wallet-show" id="mintWalletShow"></p>
             </div>
-            <button onclick="performMint()" class="btn-primary btn-full mint-btn-pulse">
+            <button onclick="performMint()" class="btn-primary btn-full mint-btn-pulse" id="mintConfirmBtn">
                 Mint Bear #<span id="randomBearNumber">442</span>
             </button>
-            <p style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:10px;">You'll receive your NFT instantly on Base</p>
+            <p style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:10px;">
+                You'll receive your NFT instantly on Base
+            </p>
         </div>
     </div>
 </div>
@@ -796,9 +754,7 @@
 <div id="toast" class="toast hidden"></div>
 
 <!-- Music Button -->
-<button onclick="toggleMusic()" id="musicBtn" class="music-btn" title="Toggle Music">
-    🎵
-</button>
+<button onclick="toggleMusic()" id="musicBtn" class="music-btn" title="Toggle Music">🎵</button>
 
 <audio id="bgMusic" loop preload="none">
     <source src="Assets/bgm-web.m4a" type="audio/mp4">
