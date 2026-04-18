@@ -626,7 +626,7 @@ async function buyPassWithUSDC() {
         const contract = new ethers.Contract(USDC_BASE, USDC_ABI, signer);
 
         // USDC has 6 decimals
-        const amount = ethers.parseUnits('2', 6);
+        const amount = ethers.parseUnits('0', 6);
         const tx     = await contract.transfer(TREASURY_ADDRESS, amount);
         btn.innerHTML = '⏳ Confirming transaction...';
         await tx.wait();
