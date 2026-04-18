@@ -3,648 +3,807 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Belly Bears - 2222 Legendary Bears</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Belly Bears — 2222 Legendary Bears on Base</title>
+    <meta name="description" content="2222 Chubby, Legendary Bears on Base. Play the game, complete tasks, and claim your whitelist spot.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+
+    <!-- Libs -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+
     <link rel="icon" href="Assets/BellyBearsLogo-Ver.jpeg" type="image/jpeg">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-[#0f172a] text-white">
+<body>
 
-    <!-- NAVBAR -->
-    <nav class="fixed top-0 w-full z-50 bg-[#0f172a]/90 backdrop-blur-md border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="Assets/BellyBearsLogo-Ver.jpeg" class="w-10 h-10 rounded-3xl" alt="Belly Bears">
-                <h1 class="text-2xl font-bold tracking-widest text-[#f39c12]">BELLY BEARS</h1>
+<!-- ═══════════════════════════════════════════
+     CURSOR
+══════════════════════════════════════════════ -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- ═══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">
+            <img src="Assets/BellyBearsLogo-Ver.jpeg" alt="Belly Bears" class="nav-logo-img">
+            <span class="nav-logo-text">BELLY BEARS</span>
+        </a>
+
+        <ul class="nav-links" id="navLinks">
+            <li><a href="#universe" class="nav-link">Universe</a></li>
+            <li><a href="#tasks" class="nav-link">Tasks</a></li>
+            <li><a href="#roadmap" class="nav-link">Roadmap</a></li>
+            <li><a href="#game" class="nav-link">Play</a></li>
+            <li><a href="#bellypass" class="nav-link nav-link-highlight">Belly Pass</a></li>
+            <li><a href="#mypass" class="nav-link">My Pass</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a href="https://x.com/belly_bears" target="_blank" class="nav-social">𝕏</a>
+            <a href="https://t.me/bellybears_bot" target="_blank" class="btn-telegram">
+                <i class="fab fa-telegram"></i> Play Game
+            </a>
+            <button id="connectBtn" onclick="openWalletModal()" class="btn-wallet">
+                <span class="btn-wallet-dot"></span>
+                Connect Wallet
+            </button>
+            <button class="nav-hamburger" id="hamburger" onclick="toggleMobileMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#universe" onclick="toggleMobileMenu()">Universe</a>
+        <a href="#tasks" onclick="toggleMobileMenu()">Tasks</a>
+        <a href="#roadmap" onclick="toggleMobileMenu()">Roadmap</a>
+        <a href="#game" onclick="toggleMobileMenu()">Play Game</a>
+        <a href="#bellypass" onclick="toggleMobileMenu()">Belly Pass</a>
+        <a href="#mypass" onclick="toggleMobileMenu()">My Pass</a>
+        <button onclick="openWalletModal();toggleMobileMenu()" class="btn-wallet mobile-connect">
+            Connect Wallet
+        </button>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section class="hero" id="home">
+    <!-- Particle field -->
+    <div class="hero-particles" id="heroParticles"></div>
+
+    <!-- Forest parallax layers -->
+    <div class="forest-layer forest-back"></div>
+    <div class="forest-layer forest-mid"></div>
+    <div class="forest-layer forest-front"></div>
+
+    <!-- Fireflies -->
+    <div class="fireflies" id="fireflies"></div>
+
+    <div class="hero-content">
+        <div class="hero-text">
+            <div class="hero-eyebrow reveal-up">
+                <span class="eyebrow-dot"></span>
+                2222 NFTs • BASE BLOCKCHAIN
             </div>
-
-            <!-- Desktop Menu -->
-            <div class="hidden md:flex gap-8 text-lg font-medium">
-                <a href="#mint" class="hover:text-[#f39c12] transition-colors">Mint</a>
-                <a href="#tasks" class="hover:text-[#f39c12] transition-colors">Tasks</a>
-                <a href="#roadmap" class="hover:text-[#f39c12] transition-colors">Roadmap</a>
-                <a href="#team" class="hover:text-[#f39c12] transition-colors">Team</a>
-                <a href="#game" class="hover:text-[#f39c12] transition-colors">Play Game</a>
-                <a href="#bellypass" class="hover:text-[#f39c12] transition-colors font-bold text-[#f39c12]">Belly Pass</a>
-                <a href="#mypass" class="hover:text-[#f39c12] transition-colors font-medium">My Pass</a>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <a href="https://x.com/belly_bears" target="_blank" class="text-3xl hover:scale-110 transition-transform">𝕏</a>
-                <a href="https://t.me/bellybears_bot" target="_blank" 
-                   class="px-5 py-2 bg-[#229ED9] rounded-full font-bold flex items-center gap-2 hover:bg-[#1a8ac4] transition-colors">
+            <h1 class="hero-title reveal-up delay-1">
+                <span class="title-line">LEGENDARY</span>
+                <span class="title-line title-amber">BELLY BEARS</span>
+            </h1>
+            <p class="hero-desc reveal-up delay-2">
+                Chubby, cool, and dangerously cute.<br>
+                Dominate the leaderboard. Join the fattest community on Base.
+            </p>
+            <div class="hero-cta reveal-up delay-3">
+                <button onclick="openMintModal()" class="btn-primary">
+                    <span>Join Whitelist</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <a href="https://t.me/bellybears_bot" target="_blank" class="btn-outline">
                     <i class="fab fa-telegram"></i> Play Game
                 </a>
-                <button onclick="connectWallet()" 
-                        class="px-6 py-2 bg-[#f39c12] text-black font-bold rounded-full hover:bg-amber-400 transition-colors">
-                    Connect Wallet
-                </button>
-                
-                <!-- Mobile Hamburger -->
-                <button onclick="toggleMobileMenu()" class="md:hidden text-3xl">
-                    <i class="fas fa-bars"></i>
-                </button>
             </div>
-        </div>
-        
-        <!-- Mobile Menu -->
-        <div id="mobileMenu" class="hidden md:hidden bg-[#0f172a] border-t border-white/10 px-6 py-6">
-            <div class="flex flex-col gap-4 text-lg font-medium">
-                <a href="#mint" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Mint</a>
-                <a href="#tasks" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Tasks</a>
-                <a href="#roadmap" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Roadmap</a>
-                <a href="#team" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Team</a>
-                <a href="#game" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">Play Game</a>
-                <a href="#bellypass" onclick="toggleMobileMenu()" class="hover:text-[#f39c12] font-bold text-[#f39c12]">Belly Pass</a>
-                <a href="#mypass" onclick="toggleMobileMenu()" class="hover:text-[#f39c12]">My Pass</a>
-                
-                <div class="pt-4 border-t border-white/10">
-                    <button onclick="connectWallet();toggleMobileMenu()" class="w-full py-3 bg-[#f39c12] text-black font-bold rounded-3xl">
-                        Connect Wallet
-                    </button>
+            <div class="hero-stats reveal-up delay-4">
+                <div class="hero-stat">
+                    <span class="stat-num" id="mintedHero">291</span>
+                    <span class="stat-label">Minted</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-num">2222</span>
+                    <span class="stat-label">Total Supply</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="hero-stat">
+                    <span class="stat-num">0.5</span>
+                    <span class="stat-label">ETH WL Mint</span>
                 </div>
             </div>
         </div>
-    </nav>
 
-    <!-- HERO -->
-    <section class="hero-bg min-h-screen flex items-center pt-20">
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-            <div class="space-y-6">
-                <h1 class="text-6xl md:text-7xl font-black leading-none tracking-tighter">
-                    2222 LEGENDARY<br>
-                    <span class="text-[#f39c12]">BELLY BEARS</span>
-                </h1>
-                <p class="text-xl text-gray-300 max-w-md">
-                    Chubby, cool, and dangerously cute. Mint your bear, complete tasks, dominate the leaderboard, and join the fattest community on TEMPO.
-                </p>
-                <div class="flex flex-wrap gap-4">
-                    <a href="https://t.me/bellybears_bot" target="_blank" 
-                       class="px-8 py-4 border-2 border-white/80 text-xl font-bold rounded-2xl hover:bg-white/10 transition-all">
-                        PLAY GAME
-                    </a>
-                    <button onclick="openMintModal()" 
-                            class="px-10 py-5 text-2xl font-bold bg-[#f39c12] text-black rounded-3xl hover:scale-105 transition-all">
-                        MINT YOUR BEAR
-                    </button>
-                </div>
-                
-                <div class="flex items-center gap-8 text-sm">
-                    <div>
-                        <span class="text-[#f39c12] font-bold">2222</span> TOTAL SUPPLY
-                    </div>
-                    <div class="h-3 w-px bg-white/30"></div>
-                    <div>ON <span class="font-bold">TEMPO</span> BLOCKCHAIN</div>
-                    <div class="h-3 w-px bg-white/30"></div>
-                    <div>WL MINT: <span class="text-[#f39c12]">0.5 TEMPO</span></div>
-                </div>
-            </div>
-            
-            <div class="flex justify-center">
-                <img src="Assets/Main-Bear.png" alt="Main Bear" class="bear-float w-full max-w-[420px] drop-shadow-2xl rounded-3xl">
-            </div>
+        <div class="hero-visual reveal-right delay-2">
+            <!-- Animated honey glow rings -->
+            <div class="bear-ring bear-ring-1"></div>
+            <div class="bear-ring bear-ring-2"></div>
+            <div class="bear-ring bear-ring-3"></div>
+            <img src="Assets/Main-Bear.png" alt="Belly Bear" class="hero-bear">
+            <!-- Floating honey drops -->
+            <div class="honey-drop h1"></div>
+            <div class="honey-drop h2"></div>
+            <div class="honey-drop h3"></div>
+            <div class="honey-drop h4"></div>
         </div>
-    </section>
+    </div>
 
-    <!-- MINT SECTION -->
-    <section id="mint" class="py-24 bg-[#1e2937]">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div>
-                    <h2 class="text-5xl font-bold mb-6">Mint Your Belly Bear</h2>
-                    <p class="text-xl text-gray-300 mb-8">2222 Legendary Bears. Whitelist spots via tasks + game leaderboard. Public mint opens after.</p>
-                    
-                    <div class="bg-[#0f172a] p-8 rounded-3xl mb-8">
-                        <div class="flex justify-between items-center mb-6">
-                            <div class="text-sm font-medium">WHITELIST MINT</div>
-                            <div class="px-4 py-1 bg-[#f39c12] text-black text-sm font-bold rounded-full">0.5 TEMPO</div>
-                        </div>
-                        <div class="h-3 bg-gray-700 rounded-full mb-2 overflow-hidden">
-                            <div class="h-3 bg-[#f39c12] w-3/4 rounded-full"></div>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span>231 / 2222 MINTED</span>
-                            <span>46 LEFT FOR WL</span>
-                        </div>
-                    </div>
-                    
-                    <button onclick="openMintModal()" 
-                            class="mint-pulse w-full py-6 text-2xl font-bold bg-gradient-to-r from-[#f39c12] to-amber-500 text-black rounded-3xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
-                        <span>MINT NOW (WHITELIST)</span>
-                        <i class="fas fa-arrow-right"></i>
-                    </button>
-                    
-                    <p class="text-center text-gray-400 text-sm mt-4">Public mint starts Q3 2026 • Max 3 per wallet</p>
-                </div>
-                
-                <div class="bg-[#0f172a] p-8 rounded-3xl">
-                    <h3 class="font-bold text-xl mb-6 flex items-center gap-3">
-                        <i class="fas fa-fire text-[#f39c12]"></i> 
-                        MINT LIVE STATUS
-                    </h3>
-                    <div class="space-y-6">
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Total Bears Minted</span>
-                            <span id="mintedCount" class="font-bold text-3xl text-[#f39c12]">231</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-300">Your Whitelist Status</span>
-                            <span id="wlStatus" class="font-bold text-emerald-400">✅ Eligible</span>
-                        </div>
-                        <div onclick="openMintModal()" class="cursor-pointer text-center py-4 border border-dashed border-[#f39c12] rounded-2xl text-[#f39c12] hover:bg-[#f39c12]/10 transition">
-                            Check your tasks → Claim spot
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Scroll indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-line"></div>
+        <span>Scroll</span>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     BEARS UNIVERSE (replaces Mint section)
+══════════════════════════════════════════════ -->
+<section id="universe" class="universe-section">
+
+    <!-- Animated forest scene -->
+    <div class="universe-scene">
+        <!-- Stars -->
+        <div class="stars-layer" id="starsLayer"></div>
+
+        <!-- Moon -->
+        <div class="moon">
+            <div class="moon-glow"></div>
         </div>
-    </section>
 
-    <!-- TASKS SECTION - RAPI + ANIMASI KECE -->
-    <section id="tasks" class="py-24 bg-[#0f172a]">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-5xl font-bold text-center mb-4">Complete Tasks • Get Whitelist</h2>
-            <p class="text-center text-gray-400 text-xl mb-16">Finish these to unlock early mint + extra rewards in game</p>
-            
-            <!-- Progress Ring -->
-            <div class="flex justify-center mb-12">
-                <div id="taskProgress" class="relative w-28 h-28 flex items-center justify-center">
-                    <svg class="w-28 h-28 -rotate-12" viewBox="0 0 42 42">
-                        <circle cx="21" cy="21" r="15" fill="none" stroke="#334155" stroke-width="6"/>
-                        <circle id="progressCircle" cx="21" cy="21" r="15" fill="none" 
-                                stroke="#f39c12" stroke-width="6" stroke-dasharray="94.2" 
-                                stroke-dashoffset="94.2" stroke-linecap="round"/>
-                    </svg>
-                    <div class="absolute text-center">
-                        <span id="progressText" class="text-4xl font-bold text-[#f39c12]">0/4</span>
+        <!-- Trees silhouettes (CSS drawn) -->
+        <div class="trees-back">
+            <div class="tree t1"></div>
+            <div class="tree t2"></div>
+            <div class="tree t3"></div>
+            <div class="tree t4"></div>
+            <div class="tree t5"></div>
+            <div class="tree t6"></div>
+            <div class="tree t7"></div>
+        </div>
+        <div class="trees-front">
+            <div class="tree tf1"></div>
+            <div class="tree tf2"></div>
+            <div class="tree tf3"></div>
+            <div class="tree tf4"></div>
+        </div>
+
+        <!-- Ground glow -->
+        <div class="ground-mist"></div>
+
+        <!-- Floating leaves -->
+        <div class="leaves-container" id="leavesContainer"></div>
+
+        <!-- Bears walking/idle -->
+        <div class="bears-scene">
+            <div class="scene-bear bear-walk" style="left:10%;animation-delay:0s;">🐻</div>
+            <div class="scene-bear bear-idle" style="left:35%;animation-delay:1.2s;">🐻</div>
+            <div class="scene-bear bear-walk-r" style="left:60%;animation-delay:2.5s;">🐻</div>
+            <div class="scene-bear bear-idle" style="left:82%;animation-delay:0.8s;">🐻</div>
+        </div>
+
+        <!-- Honey jars floating -->
+        <div class="floaters">
+            <div class="floater" style="left:15%;top:30%;animation-delay:0s;">🍯</div>
+            <div class="floater" style="left:45%;top:20%;animation-delay:1.5s;">🍯</div>
+            <div class="floater" style="left:75%;top:35%;animation-delay:0.8s;">🍯</div>
+            <div class="floater" style="left:88%;top:18%;animation-delay:2.2s;">⭐</div>
+            <div class="floater" style="left:5%;top:25%;animation-delay:3s;">✨</div>
+        </div>
+    </div>
+
+    <!-- Content overlay -->
+    <div class="universe-content">
+        <div class="universe-header">
+            <h2 class="section-title reveal-up">The Belly Bears Universe</h2>
+            <p class="section-sub reveal-up delay-1">
+                2222 hand-crafted Legendary Bears roaming the wilderness of Base blockchain.<br>
+                Each bear is unique, each bear is hungry, and each bear wants the whitelist.
+            </p>
+        </div>
+
+        <!-- Mint Stats Card -->
+        <div class="mint-stats-card reveal-up delay-2">
+            <div class="mint-card-left">
+                <div class="mint-badge">🔥 WHITELIST LIVE</div>
+                <h3 class="mint-card-title">Claim Your Bear</h3>
+                <p class="mint-card-desc">Complete tasks + dominate the game leaderboard. Whitelist spots are limited — bears don't wait.</p>
+
+                <div class="mint-progress-wrap">
+                    <div class="mint-progress-labels">
+                        <span><span id="mintedUniverse">291</span> / 2222 minted</span>
+                        <span>46 WL spots left</span>
+                    </div>
+                    <div class="mint-progress-bar">
+                        <div class="mint-progress-fill" style="width:13%"></div>
                     </div>
                 </div>
-            </div>
 
-            <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto" id="tasksList">
-                <!-- Akan diisi oleh JavaScript -->
-            </div>
-            
-            <div class="text-center mt-12">
-                <button onclick="openMintModal()" 
-                        class="mint-pulse px-10 py-5 text-xl font-bold bg-gradient-to-r from-[#f39c12] to-amber-500 text-black rounded-3xl hover:scale-105 transition-all inline-flex items-center gap-3">
-                    CONTINUE TO MINT NOW →
+                <div class="mint-price-row">
+                    <div class="price-chip">WL MINT: <strong>0.5 ETH</strong></div>
+                    <div class="price-chip">PUBLIC: <strong>0.8 ETH</strong></div>
+                    <div class="price-chip">MAX: <strong>3/wallet</strong></div>
+                </div>
+
+                <button onclick="openMintModal()" class="btn-primary mint-cta-btn">
+                    <span>Apply for Whitelist</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </button>
             </div>
-        </div>
-    </section>
 
-    <!-- ROADMAP - LENGKAP -->
-    <section id="roadmap" class="py-24 bg-[#1e2937]">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-5xl font-bold text-center mb-4">Roadmap</h2>
-            <p class="text-center text-gray-400 text-xl mb-16">Our journey to build the chubbiest empire on TEMPO</p>
-
-            <div class="relative max-w-5xl mx-auto">
-                <!-- Timeline line -->
-                <div class="hidden md:block absolute left-1/2 top-12 bottom-12 w-1 bg-gradient-to-b from-[#f39c12] to-[#e67e22] timeline-line"></div>
-
-                <div class="space-y-20">
-
-                    <!-- Phase 1 -->
-                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
-                        <div class="md:w-5/12 text-right order-2 md:order-1">
-                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q2 2026</div>
-                            <h3 class="text-3xl font-bold mt-3">Phase 1: The Birth</h3>
-                            <ul class="mt-6 space-y-3 text-gray-300">
-                                <li>🚀 Launch Telegram Mini Game</li>
-                                <li>🐻 Community &amp; Social Growth</li>
-                                <li>📋 Whitelist Task System (Website + Game)</li>
-                                <li>📊 weekly Leaderboard System</li>
-                            </ul>
-                        </div>
-                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">1</div>
-                        <div class="md:w-5/12 order-3"></div>
-                    </div>
-
-                    <!-- Phase 2 -->
-                    <div class="roadmap-card flex flex-col md:flex-row-reverse items-center gap-8">
-                        <div class="md:w-5/12"></div>
-                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10">2</div>
-                        <div class="md:w-5/12 text-left">
-                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q3 2026</div>
-                            <h3 class="text-3xl font-bold mt-3">Phase 2: Minting Era</h3>
-                            <ul class="mt-6 space-y-3 text-gray-300">
-                                <li>🔥 2222 NFT Collection Launch</li>
-                                <li>🎟️ Whitelist Claim (Game + Website Tasks)</li>
-                                <li>🌐 Public Mint</li>
-                                <li>📈 Dashboard + Leaderboard Live</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Phase 3 -->
-                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
-                        <div class="md:w-5/12 text-right order-2 md:order-1">
-                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q4 2026</div>
-                            <h3 class="text-3xl font-bold mt-3">Phase 3: Utility &amp; Rewards</h3>
-                            <ul class="mt-6 space-y-3 text-gray-300">
-                                <li>💰 Staking &amp; Passive Income</li>
-                                <li>🎮 In-game Rewards &amp; Airdrop</li>
-                                <li>🛍️ Official Merch Drop</li>
-                                <li>🏆 Holder-only Events</li>
-                            </ul>
-                        </div>
-                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">3</div>
-                        <div class="md:w-5/12 order-3"></div>
-                    </div>
-
-                    <!-- Phase 4 -->
-                    <div class="roadmap-card flex flex-col md:flex-row-reverse items-center gap-8">
-                        <div class="md:w-5/12"></div>
-                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10">4</div>
-                        <div class="md:w-5/12 text-left">
-                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">Q1 2027</div>
-                            <h3 class="text-3xl font-bold mt-3">Phase 4: Expansion</h3>
-                            <ul class="mt-6 space-y-3 text-gray-300">
-                                <li>📈 CEX Listing</li>
-                                <li>🤝 Strategic Partnerships</li>
-                                <li>🌌 Metaverse Integration</li>
-                                <li>🪙 $BELLY Token Launch</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Phase 5 -->
-                    <div class="roadmap-card flex flex-col md:flex-row items-center gap-8">
-                        <div class="md:w-5/12 text-right order-2 md:order-1">
-                            <div class="inline px-5 py-1 bg-[#f39c12] text-black rounded-full text-sm font-bold">2027+</div>
-                            <h3 class="text-3xl font-bold mt-3">Phase 5: Legacy</h3>
-                            <ul class="mt-6 space-y-3 text-gray-300">
-                                <li>🌍 Real-world Events &amp; Meetups</li>
-                                <li>🖼️ NFT Utility Expansion</li>
-                                <li>🌐 Global Community Growth</li>
-                                <li>🦸 Belly Bears Universe (Comic, Animation, etc)</li>
-                            </ul>
-                        </div>
-                        <div class="hidden md:flex w-8 h-8 bg-[#f39c12] rounded-full items-center justify-center text-black font-bold z-10 order-1 md:order-2">5</div>
-                        <div class="md:w-5/12 order-3"></div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- GAME SECTION -->
-    <section id="game" class="py-24 bg-[#1e2937]">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="grid md:grid-cols-12 gap-12 items-center">
-                <div class="md:col-span-7">
-                    <h2 class="text-5xl font-bold mb-6">Play • Earn • Dominate</h2>
-                    <p class="text-xl text-gray-300 mb-10">Our Telegram Mini Game is LIVE! Feed your bear, battle other chubbies, climb daily leaderboard and earn whitelist spots + $BELLY rewards.</p>
-                    
-                    <div class="flex gap-6">
-                        <a href="https://t.me/bellybears_bot" target="_blank" 
-                           class="flex-1 bg-[#229ED9] hover:bg-[#1a8ac4] py-8 px-10 rounded-3xl flex flex-col items-center text-center transition-colors">
-                            <i class="fab fa-telegram text-6xl mb-4"></i>
-                            <h4 class="text-2xl font-bold">OPEN IN TELEGRAM</h4>
-                            <p class="text-sm mt-2">Instant play • No download</p>
-                        </a>
-                        
-                        <div class="flex-1 bg-[#0f172a] py-8 px-10 rounded-3xl text-center">
-                            <h4 class="text-2xl font-bold mb-6">TODAY'S TOP 3</h4>
-                            <div id="leaderboardDemo" class="space-y-4"></div>
-                        </div>
+            <div class="mint-card-right">
+                <div class="mini-leaderboard">
+                    <div class="mini-lb-title">🏆 Top Players Today</div>
+                    <div id="leaderboardDemo" class="mini-lb-list">
+                        <div class="mini-lb-skeleton"></div>
+                        <div class="mini-lb-skeleton"></div>
+                        <div class="mini-lb-skeleton"></div>
                     </div>
                 </div>
-                
-                <div class="md:col-span-5">
-                    <div class="bg-black/40 rounded-3xl p-4">
-                        <img 
-                            src="Assets/ss-game.jpeg" 
-                            alt="Game Screenshot" 
-                            class="rounded-2xl w-full shadow-2xl">
-                        <p class="text-center text-xs text-gray-400 mt-4">Screenshot from Belly Bears Mini Game</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================== BELLY PASS SECTION (ENGLISH) ================== -->
-    <section id="bellypass" class="py-24 bg-[#1e2937]">
-        <div class="max-w-6xl mx-auto px-6">
-            <div class="text-center mb-16">
-                <h2 class="text-5xl font-bold mb-3">Belly Pass</h2>
-                <p class="text-2xl text-[#f39c12]">1 Month Power-Up • Combo Master + Shield 3x + Coin Magnet</p>
-                <p class="text-gray-400 mt-3">Pay once with PATHUSD → Instantly active in Telegram Game</p>
-            </div>
-
-            <div class="grid md:grid-cols-12 gap-8 items-center">
-                <!-- Power-up Cards -->
-                <div class="md:col-span-7 grid grid-cols-3 gap-6">
-                    <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
-                        <div class="text-5xl mb-4">⚡</div>
-                        <h4 class="font-bold text-xl">Combo Master</h4>
-                        <p class="text-sm text-gray-400">Combo multiplier increases 2x faster</p>
-                    </div>
-                    <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
-                        <div class="text-5xl mb-4">🛡️</div>
-                        <h4 class="font-bold text-xl">Shield 3x</h4>
-                        <p class="text-sm text-gray-400">Can be used 3 times per run<br>(when coin is missed)</p>
-                    </div>
-                    <div class="bg-[#0f172a] p-6 rounded-3xl text-center">
-                        <div class="text-5xl mb-4">🧲</div>
-                        <h4 class="font-bold text-xl">Coin Magnet</h4>
-                        <p class="text-sm text-gray-400">1 minute per run<br>(can be activated manually)</p>
-                    </div>
-                </div>
-
-                <!-- Buy Card -->
-                <div class="md:col-span-5">
-                    <div class="bg-gradient-to-br from-[#f39c12] to-amber-500 text-black rounded-3xl p-10">
-                        <div class="text-center">
-                            <div class="inline px-6 py-2 bg-black/20 text-white rounded-3xl text-sm font-bold">1 MONTH</div>
-                            
-                            <h3 class="text-4xl font-black mt-6">Belly Pass</h3>
-                            <div class="text-7xl font-black mt-2">2 PATHUSD</div>
-                            <p class="mt-1 text-black/70">Special launch price</p>
-
-                            <button onclick="openBellyPassModal()" 
-                                    class="mt-10 w-full py-6 text-2xl font-bold bg-black text-[#f39c12] rounded-3xl hover:scale-105 transition-all">
-                                BUY NOW
-                            </button>
-
-                            <p class="text-xs text-black/60 mt-8">After payment, link your Telegram account</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ================== MY PASS SECTION ================== -->
-    <section id="mypass" class="py-24 bg-[#0f172a]">
-        <div class="max-w-4xl mx-auto px-6">
-            <div class="text-center mb-12">
-                <h2 class="text-5xl font-bold">My Belly Pass</h2>
-                <p class="text-gray-400 mt-3">Check your active power-ups and expiration date</p>
-            </div>
-
-            <div id="myPassCard" class="bg-[#1e2937] rounded-3xl p-10 text-center hidden">
-                <div class="inline px-6 py-2 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-bold">ACTIVE</div>
-                <h3 class="text-3xl font-bold mt-6">Belly Pass - 1 Month</h3>
-                <p class="text-6xl font-black text-[#f39c12] mt-4" id="passExpiry">30 days left</p>
-                
-                <div class="grid grid-cols-3 gap-6 mt-10">
-                    <div class="bg-[#0f172a] p-6 rounded-2xl">
-                        <div class="text-4xl mb-2">⚡</div>
-                        <p class="font-bold">Combo Master</p>
-                    </div>
-                    <div class="bg-[#0f172a] p-6 rounded-2xl">
-                        <div class="text-4xl mb-2">🛡️</div>
-                        <p class="font-bold">Shield 3x</p>
-                    </div>
-                    <div class="bg-[#0f172a] p-6 rounded-2xl">
-                        <div class="text-4xl mb-2">🧲</div>
-                        <p class="font-bold">Coin Magnet</p>
-                    </div>
-                </div>
-
-                <p class="text-sm text-gray-400 mt-10" id="telegramLinked">Linked to: @username</p>
-            </div>
-
-            <div id="noPassMessage" class="text-center py-20">
-                <p class="text-2xl text-gray-400">You don't have an active Belly Pass yet.</p>
-                <button onclick="openBellyPassModal()" 
-                        class="mt-8 px-10 py-4 bg-[#f39c12] text-black font-bold rounded-3xl hover:scale-105 transition-all">
-                    BUY BELLY PASS NOW
-                </button>
-            </div>
-        </div>
-    </section>
-
-
-
-    <!-- TEAM -->
-    <section id="team" class="py-24 bg-[#0f172a]">
-        <div class="max-w-6xl mx-auto px-6">
-            <h2 class="text-5xl font-bold text-center mb-16">Team Belly Bears</h2>
-            <div class="grid md:grid-cols-4 gap-8">
-                <div class="text-center group">
-                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">🐻</div>
-                    <h4 class="font-bold text-xl">Chubby Founder</h4>
-                    <p class="text-gray-400">Visionary &amp; Community Leader</p>
-                </div>
-                <div class="text-center group">
-                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-pink-400 to-purple-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">🎨</div>
-                    <h4 class="font-bold text-xl">Pixel Bear</h4>
-                    <p class="text-gray-400">Lead Artist &amp; Designer</p>
-                </div>
-                <div class="text-center group">
-                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-cyan-400 to-blue-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">📱</div>
-                    <h4 class="font-bold text-xl">Game Dev Bear</h4>
-                    <p class="text-gray-400">Telegram Mini Game Developer</p>
-                </div>
-                <div class="text-center group">
-                    <div class="w-28 h-28 mx-auto bg-gradient-to-br from-emerald-400 to-teal-500 rounded-3xl flex items-center justify-center text-5xl mb-4 group-hover:scale-110 transition-transform">📈</div>
-                    <h4 class="font-bold text-xl">Marketing Bear</h4>
-                    <p class="text-gray-400">Growth &amp; Community Manager</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ -->
-    <section class="py-24 bg-[#1e2937]">
-        <div class="max-w-4xl mx-auto px-6">
-            <h2 class="text-5xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-            <div class="space-y-6">
-                <details class="bg-[#0f172a] p-6 rounded-3xl group">
-                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
-                        How to get Whitelist?
-                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-                    </summary>
-                    <p class="mt-4 text-gray-300">Complete tasks on this website + play the game and climb the daily leaderboard. Top players get guaranteed WL.</p>
-                </details>
-                <details class="bg-[#0f172a] p-6 rounded-3xl group">
-                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
-                        When is the Mint?
-                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-                    </summary>
-                    <p class="mt-4 text-gray-300">Whitelist mint in Q3 2026. Public mint follows shortly after. Exact date announced in Telegram.</p>
-                </details>
-                <details class="bg-[#0f172a] p-6 rounded-3xl group">
-                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
-                        How to contact the team?
-                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-                    </summary>
-                    <p class="mt-4 text-gray-300">Join our Telegram Community: <a href="https://t.me/bellybears_bot" class="text-[#f39c12] underline">t.me/bellybears_bot</a></p>
-                </details>
-                <details class="bg-[#0f172a] p-6 rounded-3xl group">
-                    <summary class="font-bold text-xl cursor-pointer flex justify-between items-center">
-                        Is this on TEMPO?
-                        <i class="fas fa-chevron-down group-open:rotate-180 transition"></i>
-                    </summary>
-                    <p class="mt-4 text-gray-300">Yes! All NFTs and the game run on TEMPO for super fast &amp; cheap transactions.</p>
-                </details>
-            </div>
-        </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="bg-black py-16 text-center">
-        <p class="text-2xl font-bold text-[#f39c12]">BELLY BEARS</p>
-        <p class="text-gray-500 mt-2">2222 Legendary Chubby Bears on TEMPO</p>
-        <div class="flex justify-center gap-8 mt-10 text-4xl">
-            <a href="https://x.com/belly_bears" target="_blank" class="hover:text-[#f39c12] transition">𝕏</a>
-            <a href="https://t.me/bellybears_bot" target="_blank" class="hover:text-[#229ED9] transition">📱</a>
-        </div>
-        <p class="text-xs text-gray-600 mt-12">© 2026 Belly Bears. All rights reserved.</p>
-    </footer>
-
-    <!-- MINTING MODAL -->
-    <div id="mintModal" onclick="if(event.target.id === 'mintModal') closeMintModal()" 
-         class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] px-4">
-        <div onclick="event.stopImmediatePropagation()" 
-             class="modal bg-[#1a1428] w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-[#f39c12]/30 shadow-2xl">
-            
-            <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center">
-                <div class="flex gap-2">
-                    <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
-                    <div class="w-3 h-3 rounded-full bg-purple-400"></div>
-                </div>
-                <h2 class="text-xl font-bold">MINT YOUR BELLY BEAR</h2>
-                <button onclick="closeMintModal()" class="text-4xl text-gray-400 hover:text-white leading-none">×</button>
-            </div>
-
-            <div class="p-8">
-                <!-- Progress Steps -->
-                <div class="flex justify-between mb-8 px-4">
-                    <div onclick="goToStep(1)" id="step1" class="cursor-pointer w-9 h-9 rounded-2xl bg-[#f39c12] text-black flex items-center justify-center font-bold text-lg shadow-inner">1</div>
-                    <div onclick="goToStep(2)" id="step2" class="cursor-pointer w-9 h-9 rounded-2xl bg-gray-700 flex items-center justify-center font-bold text-lg">2</div>
-                    <div onclick="goToStep(3)" id="step3" class="cursor-pointer w-9 h-9 rounded-2xl bg-gray-700 flex items-center justify-center font-bold text-lg">3</div>
-                </div>
-
-                <!-- Step 1 -->
-                <div id="stepContent1">
-                    <h3 class="text-2xl font-bold text-center mb-6">Step 1: Get Whitelist</h3>
-                    <div id="modalTasksList" class="space-y-4 mb-8"></div>
-
-                    <div class="bg-[#2a2140] p-6 rounded-3xl mb-8">
-                        <div class="flex justify-between items-center">
-                            <div class="font-bold flex items-center gap-2">
-                                <i class="fas fa-gamepad text-emerald-400"></i>
-                                🎮 Game Leaderboard WL
-                            </div>
-                            <button onclick="claimGameWL()" class="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 rounded-2xl font-bold">Claim Guaranteed WL</button>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-2">Reach Top 100 in game → Get automatic WL here</p>
-                    </div>
-
-                    <div class="mt-6">
-                        <label class="block text-sm mb-2 font-medium">Telegram Username (required)</label>
-                        <input id="tgUsername" type="text" placeholder="@yourusername" 
-                               class="w-full bg-[#2a2140] px-6 py-4 rounded-3xl outline-none text-white">
-                    </div>
-
-                    <button onclick="submitTasksAndContinue()" 
-                            class="mt-8 w-full py-5 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-xl rounded-3xl flex items-center justify-center gap-3">
-                        SAVE &amp; CONTINUE TO WALLET <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-
-                <!-- Step 2 -->
-                <div id="stepContent2" class="hidden">
-                    <h3 class="text-2xl font-bold text-center mb-6">Step 2: Connect Wallet</h3>
-                    <div class="bg-[#2a2140] p-8 rounded-3xl text-center mb-8">
-                        <i class="fas fa-wallet text-6xl mb-6 text-[#f39c12]"></i>
-                        <p class="text-lg mb-6">Connect your TEMPO wallet</p>
-                        <button onclick="connectWalletInModal()" 
-                                class="w-full py-5 bg-white text-black font-bold rounded-3xl hover:bg-amber-300">
-                            CONNECT WALLET
-                        </button>
-                        <p id="walletAddressDisplay" class="text-xs text-emerald-400 mt-4 font-mono"></p>
-                    </div>
-                    <button onclick="nextStep()" class="w-full py-5 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-xl rounded-3xl">NEXT →</button>
-                </div>
-
-                <!-- Step 3 -->
-                <div id="stepContent3" class="hidden">
-                    <h3 class="text-2xl font-bold text-center mb-6">Step 3: Mint Your Bear</h3>
-                    <div class="text-center py-8">
-                        <div id="mintPreview" class="mx-auto w-40 h-40 bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl flex items-center justify-center text-8xl mb-8">🐻</div>
-                        <p class="text-2xl font-bold mb-2">Ready to mint?</p>
-                        <p class="text-gray-400">Cost: <span class="text-[#f39c12]">0.5 TEMPO</span></p>
-                    </div>
-                    <button onclick="performMint()" 
-                            class="mint-pulse w-full py-6 text-2xl font-bold bg-gradient-to-r from-[#f39c12] to-amber-500 text-black rounded-3xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
-                        MINT BEAR #<span id="randomBearNumber">442</span>
-                    </button>
-                    <p class="text-xs text-center text-gray-400 mt-6">You will receive your NFT instantly on TEMPO</p>
+                <div class="wl-status-box">
+                    <span class="wl-status-label">Your WL Status</span>
+                    <span id="wlStatus" class="wl-status-val">✅ Eligible</span>
+                    <div onclick="openMintModal()" class="wl-cta">Check tasks → Claim spot</div>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
+<!-- ═══════════════════════════════════════════
+     TASKS
+══════════════════════════════════════════════ -->
+<section id="tasks" class="tasks-section">
+    <div class="section-container">
+        <div class="tasks-header">
+            <h2 class="section-title reveal-up">Complete Tasks<br><em>Get Whitelist</em></h2>
+            <p class="section-sub reveal-up delay-1">Finish these missions to unlock early WL + extra in-game rewards</p>
+        </div>
 
-    <!-- BELLY PASS MODAL - ENGLISH -->
-    <div id="bellyPassModal" onclick="if(event.target.id === 'bellyPassModal') closeBellyPassModal()" 
-        class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[100] px-4">
-        <div onclick="event.stopImmediatePropagation()" 
-            class="modal bg-[#1a1428] w-full max-w-lg mx-auto rounded-3xl overflow-hidden border border-[#f39c12]/30">
-            
-            <div class="px-8 py-6 border-b border-white/10 flex justify-between items-center">
-                <h2 class="text-2xl font-bold">Purchase Belly Pass</h2>
-                <button onclick="closeBellyPassModal()" class="text-4xl text-gray-400 hover:text-white leading-none">×</button>
+        <!-- Progress Ring -->
+        <div class="progress-ring-wrap reveal-up delay-2">
+            <svg class="progress-svg" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+                <circle id="progressCircle" cx="60" cy="60" r="50" fill="none"
+                        stroke="url(#ringGrad)" stroke-width="10"
+                        stroke-dasharray="314.16" stroke-dashoffset="314.16"
+                        stroke-linecap="round" transform="rotate(-90 60 60)"/>
+                <defs>
+                    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#f59e0b"/>
+                        <stop offset="100%" stop-color="#ef4444"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            <div class="progress-center">
+                <span id="progressText" class="progress-num">0/4</span>
+                <span class="progress-sub">done</span>
+            </div>
+        </div>
+
+        <div class="tasks-grid" id="tasksList"></div>
+
+        <div class="tasks-cta reveal-up">
+            <button onclick="openMintModal()" class="btn-primary btn-large">
+                <span>Continue to Whitelist</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     ROADMAP
+══════════════════════════════════════════════ -->
+<section id="roadmap" class="roadmap-section">
+    <div class="section-container">
+        <h2 class="section-title text-center reveal-up">The Journey</h2>
+        <p class="section-sub text-center reveal-up delay-1">Building the chubbiest empire on Base, one phase at a time</p>
+
+        <div class="roadmap-track">
+            <div class="roadmap-line"></div>
+
+            <div class="roadmap-item rm-left reveal-left">
+                <div class="rm-dot"><span>1</span></div>
+                <div class="rm-card">
+                    <div class="rm-tag">Q2 2026</div>
+                    <h3 class="rm-title">Phase 1: The Birth</h3>
+                    <ul class="rm-list">
+                        <li>🚀 Launch Telegram Mini Game</li>
+                        <li>🐻 Community & Social Growth</li>
+                        <li>📋 Whitelist Task System</li>
+                        <li>📊 Weekly Leaderboard System</li>
+                    </ul>
+                </div>
             </div>
 
-            <div class="p-8 space-y-8">
-                <div class="bg-[#2a2140] rounded-3xl p-6 text-center">
-                    <p class="text-sm text-gray-400">Price</p>
-                    <p class="text-6xl font-black text-[#f39c12]">2 PATHUSD</p>
-                    <p class="text-xs mt-2">Valid for 30 days • All power-ups included</p>
+            <div class="roadmap-item rm-right reveal-right">
+                <div class="rm-dot"><span>2</span></div>
+                <div class="rm-card">
+                    <div class="rm-tag">Q3 2026</div>
+                    <h3 class="rm-title">Phase 2: Whitelist Era</h3>
+                    <ul class="rm-list">
+                        <li>🔥 2222 NFT Collection on Base</li>
+                        <li>🎟️ Whitelist Claim (Tasks + Game)</li>
+                        <li>🌐 Public Mint Opens</li>
+                        <li>📈 Dashboard + Leaderboard Live</li>
+                    </ul>
                 </div>
+            </div>
 
-                <div id="passStep1">
-                    <button onclick="buyPassWithPathUSD()" 
-                            class="w-full py-6 bg-gradient-to-r from-[#f39c12] to-amber-500 text-black font-bold text-2xl rounded-3xl hover:scale-105 transition-all">
-                        PAY 2 PATHUSD
-                    </button>
-                    <p class="text-center text-xs text-gray-400 mt-4">Using your TEMPO wallet</p>
+            <div class="roadmap-item rm-left reveal-left">
+                <div class="rm-dot"><span>3</span></div>
+                <div class="rm-card">
+                    <div class="rm-tag">Q4 2026</div>
+                    <h3 class="rm-title">Phase 3: Utility & Rewards</h3>
+                    <ul class="rm-list">
+                        <li>💰 Staking & Passive Income</li>
+                        <li>🎮 In-game Rewards & Airdrop</li>
+                        <li>🛍️ Official Merch Drop</li>
+                        <li>🏆 Holder-only Events</li>
+                    </ul>
                 </div>
+            </div>
 
-                <!-- Step 2: Link Telegram -->
-                <div id="passStep2" class="hidden">
-                    <h3 class="font-bold text-xl mb-4">Link Your Telegram Account</h3>
-                    <input id="passTgUsername" type="text" placeholder="@yourusername" 
-                        class="w-full bg-[#2a2140] px-6 py-5 rounded-3xl outline-none text-white text-lg">
-                    <button onclick="linkTelegramAfterPayment()" 
-                            class="mt-6 w-full py-5 bg-white text-black font-bold rounded-3xl hover:bg-amber-300 transition-all">
-                        LINK TELEGRAM ACCOUNT
-                    </button>
-                    <p class="text-xs text-center text-gray-400 mt-4">Your pass will be active in the game after this</p>
+            <div class="roadmap-item rm-right reveal-right">
+                <div class="rm-dot"><span>4</span></div>
+                <div class="rm-card">
+                    <div class="rm-tag">Q1 2027</div>
+                    <h3 class="rm-title">Phase 4: Expansion</h3>
+                    <ul class="rm-list">
+                        <li>📈 CEX Listing</li>
+                        <li>🤝 Strategic Partnerships</li>
+                        <li>🌌 Metaverse Integration</li>
+                        <li>🪙 $BELLY Token Launch</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="roadmap-item rm-left reveal-left">
+                <div class="rm-dot rm-dot-last"><span>5</span></div>
+                <div class="rm-card rm-card-last">
+                    <div class="rm-tag">2027+</div>
+                    <h3 class="rm-title">Phase 5: Legacy</h3>
+                    <ul class="rm-list">
+                        <li>🌍 Real-world Events & Meetups</li>
+                        <li>🖼️ NFT Utility Expansion</li>
+                        <li>🌐 Global Community Growth</li>
+                        <li>🦸 Belly Bears Universe (Comic, Animation)</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>      
+    </div>
+</section>
 
+<!-- ═══════════════════════════════════════════
+     GAME
+══════════════════════════════════════════════ -->
+<section id="game" class="game-section">
+    <div class="section-container">
+        <div class="game-grid">
+            <div class="game-text">
+                <div class="game-eyebrow reveal-up">🎮 LIVE NOW</div>
+                <h2 class="section-title reveal-up delay-1">Play · Earn<br><em>Dominate</em></h2>
+                <p class="section-sub reveal-up delay-2">
+                    Our Telegram Mini Game is LIVE. Feed your bear, battle other chubbies,
+                    climb the daily leaderboard and earn whitelist spots + $BELLY rewards.
+                </p>
 
-    
-    <script src="script.js"></script>
+                <div class="game-actions reveal-up delay-3">
+                    <a href="https://t.me/bellybears_bot" target="_blank" class="game-btn-tg">
+                        <i class="fab fa-telegram"></i>
+                        <div>
+                            <span class="game-btn-label">Open in Telegram</span>
+                            <span class="game-btn-sub">Instant play • No download</span>
+                        </div>
+                    </a>
+                </div>
 
-    <!-- AUDIO + MUSIC BUTTON -->
-    <audio id="bgMusic" loop preload="none">
-        <source src="Assets/bgm-web.m4a" type="audio/mp4">
-        Your browser does not support the audio element.
-    </audio>
+                <div class="game-features reveal-up delay-4">
+                    <div class="game-feat">
+                        <span class="feat-icon">🏆</span>
+                        <span>Daily Leaderboard</span>
+                    </div>
+                    <div class="game-feat">
+                        <span class="feat-icon">🎟️</span>
+                        <span>WL Rewards</span>
+                    </div>
+                    <div class="game-feat">
+                        <span class="feat-icon">⚡</span>
+                        <span>Power-ups</span>
+                    </div>
+                    <div class="game-feat">
+                        <span class="feat-icon">🛡️</span>
+                        <span>Belly Pass Boost</span>
+                    </div>
+                </div>
+            </div>
 
-    <button onclick="toggleMusic()" 
-            id="musicBtn"
-            class="fixed bottom-6 right-6 bg-[#f39c12] hover:bg-amber-400 text-black p-4 rounded-full shadow-2xl transition-all z-50 flex items-center justify-center w-14 h-14">
-        🎵
-    </button>
+            <div class="game-visual reveal-right delay-2">
+                <div class="game-screenshot-wrap">
+                    <div class="game-screen-glow"></div>
+                    <img src="Assets/ss-game.jpeg" alt="Belly Bears Game" class="game-screenshot">
+                    <div class="game-screen-overlay">
+                        <div class="live-badge">● LIVE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
+<!-- ═══════════════════════════════════════════
+     BELLY PASS
+══════════════════════════════════════════════ -->
+<section id="bellypass" class="bellypass-section">
+    <!-- Animated honey bg -->
+    <div class="honey-bg">
+        <div class="hb-cell hb1"></div>
+        <div class="hb-cell hb2"></div>
+        <div class="hb-cell hb3"></div>
+    </div>
+
+    <div class="section-container">
+        <div class="bp-header">
+            <h2 class="section-title reveal-up">Belly Pass</h2>
+            <p class="section-sub reveal-up delay-1">One month of pure power. Dominate every run.</p>
+        </div>
+
+        <div class="bp-grid">
+            <!-- Power-up cards -->
+            <div class="bp-powers reveal-up delay-1">
+                <div class="power-card pc-combo">
+                    <div class="power-icon">⚡</div>
+                    <h4 class="power-title">Combo Master</h4>
+                    <p class="power-desc">Double coins on every catch. Your score multiplier goes insane.</p>
+                    <div class="power-tag">Always Active</div>
+                </div>
+                <div class="power-card pc-shield">
+                    <div class="power-icon">🛡️</div>
+                    <h4 class="power-title">Shield ×3</h4>
+                    <p class="power-desc">3 lives per run. Let bombs bounce off you like they're nothing.</p>
+                    <div class="power-tag">3 Charges / Run</div>
+                </div>
+                <div class="power-card pc-magnet">
+                    <div class="power-icon">🧲</div>
+                    <h4 class="power-title">Coin Magnet</h4>
+                    <p class="power-desc">All coins fly straight to you. 60 seconds of absolute greed.</p>
+                    <div class="power-tag">1 Min Activation</div>
+                </div>
+            </div>
+
+            <!-- Buy card -->
+            <div class="bp-buy-wrap reveal-up delay-2">
+                <div class="bp-buy-card">
+                    <div class="bp-card-glow"></div>
+                    <div class="bp-duration">1 MONTH PASS</div>
+                    <div class="bp-price">
+                        <span class="bp-price-num">2</span>
+                        <span class="bp-price-unit">USDC</span>
+                    </div>
+                    <p class="bp-price-note">Special launch price on Base</p>
+
+                    <div class="bp-features-list">
+                        <div class="bp-feat-item">✅ All 3 power-ups active</div>
+                        <div class="bp-feat-item">✅ Linked to your Telegram</div>
+                        <div class="bp-feat-item">✅ Instant activation</div>
+                        <div class="bp-feat-item">✅ Pay with USDC on Base</div>
+                    </div>
+
+                    <button onclick="openBellyPassModal()" class="bp-buy-btn">
+                        <span>Buy Now — 2 USDC</span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                    <p class="bp-footnote">After payment, link your Telegram @username</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     MY PASS
+══════════════════════════════════════════════ -->
+<section id="mypass" class="mypass-section">
+    <div class="section-container narrow">
+        <h2 class="section-title text-center reveal-up">My Belly Pass</h2>
+        <p class="section-sub text-center reveal-up delay-1">Check your active power-ups and expiration</p>
+
+        <div id="myPassCard" class="mypass-card hidden reveal-up delay-2">
+            <div class="mypass-badge">● ACTIVE</div>
+            <h3 class="mypass-title">Belly Pass — 1 Month</h3>
+            <div class="mypass-days" id="passExpiry">30 days left</div>
+            <div class="mypass-powers">
+                <div class="mypass-power">⚡ Combo Master</div>
+                <div class="mypass-power">🛡️ Shield ×3</div>
+                <div class="mypass-power">🧲 Coin Magnet</div>
+            </div>
+            <p class="mypass-linked" id="telegramLinked">Linked to: @username</p>
+        </div>
+
+        <div id="noPassMessage" class="nopass-msg reveal-up delay-2">
+            <div class="nopass-icon">🐻</div>
+            <p>You don't have an active Belly Pass yet.</p>
+            <button onclick="openBellyPassModal()" class="btn-primary">Buy Belly Pass</button>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     TEAM
+══════════════════════════════════════════════ -->
+<section id="team" class="team-section">
+    <div class="section-container">
+        <h2 class="section-title text-center reveal-up">The Bearish Team</h2>
+        <div class="team-grid">
+            <div class="team-card reveal-up delay-1">
+                <div class="team-avatar" style="--c1:#f59e0b;--c2:#ef4444;">🐻</div>
+                <h4 class="team-name">Chubby Founder</h4>
+                <p class="team-role">Visionary & Community Leader</p>
+            </div>
+            <div class="team-card reveal-up delay-2">
+                <div class="team-avatar" style="--c1:#ec4899;--c2:#8b5cf6;">🎨</div>
+                <h4 class="team-name">Pixel Bear</h4>
+                <p class="team-role">Lead Artist & Designer</p>
+            </div>
+            <div class="team-card reveal-up delay-3">
+                <div class="team-avatar" style="--c1:#06b6d4;--c2:#3b82f6;">📱</div>
+                <h4 class="team-name">Game Dev Bear</h4>
+                <p class="team-role">Telegram Mini Game Dev</p>
+            </div>
+            <div class="team-card reveal-up delay-4">
+                <div class="team-avatar" style="--c1:#10b981;--c2:#14b8a6;">📈</div>
+                <h4 class="team-name">Marketing Bear</h4>
+                <p class="team-role">Growth & Community Manager</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FAQ
+══════════════════════════════════════════════ -->
+<section class="faq-section">
+    <div class="section-container narrow">
+        <h2 class="section-title text-center reveal-up">Got Questions?</h2>
+        <div class="faq-list">
+            <details class="faq-item reveal-up delay-1">
+                <summary>How do I get Whitelisted?</summary>
+                <p>Complete the 4 tasks on this page + reach Top 100 in the Telegram game. Top players get guaranteed WL spots automatically.</p>
+            </details>
+            <details class="faq-item reveal-up delay-2">
+                <summary>When is the Mint?</summary>
+                <p>Whitelist mint in Q3 2026. Public mint follows shortly after. Exact date announced in our Telegram channel.</p>
+            </details>
+            <details class="faq-item reveal-up delay-3">
+                <summary>Which blockchain?</summary>
+                <p>Belly Bears are minted on <strong>Base</strong> — Coinbase's L2 on Ethereum. Fast, cheap, and reliable.</p>
+            </details>
+            <details class="faq-item reveal-up delay-4">
+                <summary>What is the Belly Pass?</summary>
+                <p>A 1-month game power-up pass purchased with USDC on Base. Includes Combo Master (double coins), Shield ×3, and Coin Magnet. Linked to your Telegram account.</p>
+            </details>
+            <details class="faq-item reveal-up">
+                <summary>How to contact the team?</summary>
+                <p>Join our Telegram: <a href="https://t.me/bellybears_bot" target="_blank">t.me/bellybears_bot</a> or find us on X: <a href="https://x.com/belly_bears" target="_blank">@belly_bears</a></p>
+            </details>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer class="footer">
+    <div class="footer-glow"></div>
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <img src="Assets/BellyBearsLogo-Ver.jpeg" alt="Belly Bears" class="footer-logo">
+            <h3 class="footer-name">BELLY BEARS</h3>
+            <p class="footer-tagline">2222 Legendary Chubby Bears on Base</p>
+        </div>
+        <div class="footer-links">
+            <a href="https://x.com/belly_bears" target="_blank" class="footer-link">𝕏 Twitter</a>
+            <a href="https://t.me/bellybears_bot" target="_blank" class="footer-link">📱 Telegram</a>
+            <a href="https://belly-bears.xyz" class="footer-link">🌐 Website</a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 Belly Bears. All rights reserved.</p>
+        <p class="footer-music-credit">Music: "Carefree" & "Sneaky Snitch" by Kevin MacLeod (CC BY 4.0)</p>
+    </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════
+     WALLET MODAL
+══════════════════════════════════════════════ -->
+<div id="walletModal" class="modal-backdrop hidden" onclick="if(event.target===this)closeWalletModal()">
+    <div class="modal-box wallet-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Connect Wallet</h2>
+            <button class="modal-close" onclick="closeWalletModal()">✕</button>
+        </div>
+        <p class="wallet-modal-sub">Connect your wallet to access all Belly Bears features on <strong>Base</strong></p>
+
+        <div class="wallet-options">
+            <button class="wallet-option" onclick="connectWithProvider('metamask')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="wallet-opt-icon">
+                <div class="wallet-opt-info">
+                    <span class="wallet-opt-name">MetaMask</span>
+                    <span class="wallet-opt-desc">Browser extension wallet</span>
+                </div>
+                <svg class="wallet-opt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+            <button class="wallet-option" onclick="connectWithProvider('coinbase')">
+                <div class="wallet-opt-icon coinbase-icon">🟦</div>
+                <div class="wallet-opt-info">
+                    <span class="wallet-opt-name">Coinbase Wallet</span>
+                    <span class="wallet-opt-desc">Native Base wallet • Recommended</span>
+                </div>
+                <svg class="wallet-opt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+            <button class="wallet-option" onclick="connectWithProvider('rabby')">
+                <div class="wallet-opt-icon" style="font-size:1.6rem;">🐰</div>
+                <div class="wallet-opt-info">
+                    <span class="wallet-opt-name">Rabby Wallet</span>
+                    <span class="wallet-opt-desc">Multi-chain browser wallet</span>
+                </div>
+                <svg class="wallet-opt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+
+            <button class="wallet-option" onclick="connectWithProvider('injected')">
+                <div class="wallet-opt-icon" style="font-size:1.6rem;">🔗</div>
+                <div class="wallet-opt-info">
+                    <span class="wallet-opt-name">Other Wallet</span>
+                    <span class="wallet-opt-desc">Any browser-injected wallet</span>
+                </div>
+                <svg class="wallet-opt-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+        <p class="wallet-modal-footnote">By connecting, you agree to our Terms of Service. Always verify you're on <strong>belly-bears.xyz</strong></p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     WHITELIST MODAL
+══════════════════════════════════════════════ -->
+<div id="mintModal" class="modal-backdrop hidden" onclick="if(event.target===this)closeMintModal()">
+    <div class="modal-box mint-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Get Your Belly Bear</h2>
+            <button class="modal-close" onclick="closeMintModal()">✕</button>
+        </div>
+
+        <!-- Steps -->
+        <div class="modal-steps">
+            <div class="step-pill" id="step1pill">1</div>
+            <div class="step-connector"></div>
+            <div class="step-pill step-inactive" id="step2pill">2</div>
+            <div class="step-connector"></div>
+            <div class="step-pill step-inactive" id="step3pill">3</div>
+        </div>
+
+        <!-- Step 1 -->
+        <div id="stepContent1">
+            <h3 class="modal-step-title">Step 1: Complete Tasks</h3>
+            <div id="modalTasksList" class="modal-tasks"></div>
+            <div class="modal-game-wl">
+                <div class="game-wl-info">
+                    <span class="game-wl-icon">🎮</span>
+                    <div>
+                        <div class="game-wl-title">Game Leaderboard WL</div>
+                        <div class="game-wl-sub">Reach Top 100 in game → Get automatic WL</div>
+                    </div>
+                </div>
+                <button onclick="claimGameWL()" class="btn-sm-amber">Claim WL</button>
+            </div>
+            <div class="modal-tg-input">
+                <label>Telegram Username (required)</label>
+                <input id="tgUsername" type="text" placeholder="@yourusername" class="modal-input">
+            </div>
+            <button onclick="submitTasksAndContinue()" class="btn-primary btn-full">
+                Save & Continue <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+
+        <!-- Step 2 -->
+        <div id="stepContent2" class="hidden">
+            <h3 class="modal-step-title">Step 2: Connect Wallet</h3>
+            <div class="connect-wallet-box">
+                <div class="cw-icon">💎</div>
+                <p>Connect your Base wallet to secure your whitelist spot</p>
+                <button onclick="openWalletModal()" class="btn-primary">Connect Wallet</button>
+                <div id="walletAddressDisplay" class="wallet-addr-display"></div>
+            </div>
+            <button onclick="nextStep()" class="btn-primary btn-full" style="margin-top:16px;">Next →</button>
+        </div>
+
+        <!-- Step 3 -->
+        <div id="stepContent3" class="hidden">
+            <h3 class="modal-step-title">Step 3: Secure Your Spot</h3>
+            <div class="mint-confirm">
+                <div class="mint-bear-preview">🐻</div>
+                <h4>Ready to join the whitelist?</h4>
+                <p>Mint Price: <strong style="color:var(--amber);">0.5 ETH</strong></p>
+                <p class="mint-wallet-show" id="mintWalletShow"></p>
+            </div>
+            <button onclick="performMint()" class="btn-primary btn-full mint-btn-pulse">
+                Mint Bear #<span id="randomBearNumber">442</span>
+            </button>
+            <p style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:10px;">You'll receive your NFT instantly on Base</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     BELLY PASS MODAL
+══════════════════════════════════════════════ -->
+<div id="bellyPassModal" class="modal-backdrop hidden" onclick="if(event.target===this)closeBellyPassModal()">
+    <div class="modal-box pass-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Purchase Belly Pass</h2>
+            <button class="modal-close" onclick="closeBellyPassModal()">✕</button>
+        </div>
+
+        <div class="pass-price-display">
+            <span class="pass-price-big">2 USDC</span>
+            <span class="pass-price-sub">Valid 30 days • All power-ups included • Base network</span>
+        </div>
+
+        <div id="passStep1">
+            <button onclick="buyPassWithUSDC()" class="btn-primary btn-full btn-large">
+                Pay 2 USDC on Base
+            </button>
+            <p class="pass-modal-note">Requires wallet connected to Base network</p>
+        </div>
+
+        <div id="passStep2" class="hidden">
+            <h3 class="modal-step-title">Link Your Telegram</h3>
+            <input id="passTgUsername" type="text" placeholder="@yourusername" class="modal-input">
+            <button onclick="linkTelegramAfterPayment()" class="btn-primary btn-full" style="margin-top:12px;">
+                Activate Belly Pass
+            </button>
+            <p class="pass-modal-note">Your pass will be active in the Telegram game immediately</p>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     TOAST
+══════════════════════════════════════════════ -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Music Button -->
+<button onclick="toggleMusic()" id="musicBtn" class="music-btn" title="Toggle Music">
+    🎵
+</button>
+
+<audio id="bgMusic" loop preload="none">
+    <source src="Assets/bgm-web.m4a" type="audio/mp4">
+</audio>
+
+<script src="script.js"></script>
 </body>
 </html>
