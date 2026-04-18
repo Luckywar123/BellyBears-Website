@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   BELLY BEARS — SCRIPT.JS
+   BELLY BEARS — SCRIPT.JS (UPDATED)
    Base Chain • Wallet Module • Supabase • Animations
 ═══════════════════════════════════════════════════════ */
 
@@ -7,14 +7,11 @@
 const SUPABASE_URL     = 'https://tfdxmqvkkiidujrunfcp.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRmZHhtcXZra2lpZHVqcnVuZmNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0MjI5MTksImV4cCI6MjA4ODk5ODkxOX0.hKf_DquWy9dosADgAHedk7qyN4QPX31k8upzW4SDK3Q';
 
-// Base chain config
 const BASE_CHAIN_ID    = 8453;
 const BASE_RPC         = 'https://mainnet.base.org';
 const BASE_EXPLORER    = 'https://basescan.org';
 
-// USDC on Base
 const USDC_BASE        = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913';
-// Treasury wallet — GANTI dengan address kamu
 const TREASURY_ADDRESS = '0xedf790A178cb47002309F28315c76155152b1EDb';
 
 const USDC_ABI = [
@@ -34,10 +31,10 @@ let isMusicPlaying    = false;
 const TASKS_KEY = 'bellyBearsTasks';
 
 let tasks = [
-    { id: 1, title: 'Follow @belly_bears on X',              link: 'https://x.com/belly_bears',    completed: false },
-    { id: 2, title: 'Join the Telegram Community',           link: 'https://t.me/bellybears_bot',  completed: false },
-    { id: 3, title: 'Share your bear on X (tag @belly_bears)', link: 'https://x.com/belly_bears',  completed: false },
-    { id: 4, title: 'Play Game & Reach Top 100 Daily',       gameTask: true,                        completed: false }
+    { id: 1, title: 'Follow @belly_bears on X',                link: 'https://x.com/belly_bears',    completed: false },
+    { id: 2, title: 'Join the Telegram Community',             link: 'https://t.me/bellybears_bot',  completed: false },
+    { id: 3, title: 'Share your bear on X (tag @belly_bears)', link: 'https://x.com/intent/tweet?text=Just+joined+%40belly_bears+on+Base+%F0%9F%90%BB+2222+Legendary+Bears+%E2%80%94+get+your+whitelist+spot+now%21+%23BellyBears+%23Base', requiresProof: true, completed: false, proof: '' },
+    { id: 4, title: 'Play Game & Reach Top 100 Daily',         gameTask: true,                        completed: false }
 ];
 
 // ════════════════════════════════════════════════════════
@@ -56,6 +53,7 @@ window.addEventListener('DOMContentLoaded', () => {
     animateProgress();
     fetchLeaderboard();
     initRandBearNumber();
+    fetchMintedCount(); // ← real count from DB
 
     const saved = loadWalletSession();
     if (saved) {
@@ -64,20 +62,6 @@ window.addEventListener('DOMContentLoaded', () => {
         updateWalletUI();
         checkMyPass();
     }
-
-    // Live minted counter
-    setInterval(() => {
-        const el = document.getElementById('mintedHero');
-        const el2 = document.getElementById('mintedUniverse');
-        if (el) {
-            const v = parseInt(el.textContent) || 291;
-            if (v < 350) {
-                const nv = v + Math.floor(Math.random() * 2);
-                el.textContent  = nv;
-                if (el2) el2.textContent = nv;
-            }
-        }
-    }, 9000);
 
     console.log('%c🐻 Belly Bears READY', 'color:#f59e0b;font-size:16px;font-weight:bold');
 });
@@ -93,6 +77,52 @@ function initSupabase() {
     } catch (e) {
         console.error('❌ Supabase init failed:', e);
     }
+}
+
+// ════════════════════════════════════════════════════════
+// MINTED COUNT — Real data from whitelist_claims table
+// ════════════════════════════════════════════════════════
+async function fetchMintedCount() {
+    if (!supabaseClient) return;
+    try {
+        const { count, error } = await supabaseClient
+            .from('whitelist_claims')
+            .select('*', { count: 'exact', head: true });
+
+        if (error) throw error;
+
+        if (count !== null) {
+            updateMintedUI(count);
+        }
+    } catch (e) {
+        console.warn('fetchMintedCount error:', e);
+    }
+}
+
+function updateMintedUI(count) {
+    const targets = document.querySelectorAll('#mintedHero, #mintedUniverse');
+    targets.forEach(el => {
+        if (el) animateCounter(el, parseInt(el.textContent) || 0, count, 800);
+    });
+
+    // Update progress bar (out of 2222)
+    const pct = Math.min((count / 2222) * 100, 100).toFixed(1);
+    const bar = document.querySelector('.mint-progress-fill');
+    if (bar) bar.style.width = pct + '%';
+
+    const label = document.querySelector('.mint-progress-labels span:first-child');
+    if (label) label.innerHTML = `<span id="mintedUniverse">${count}</span> / 2222 minted`;
+}
+
+function animateCounter(el, from, to, duration) {
+    const start = performance.now();
+    const update = (now) => {
+        const pct = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - pct, 3);
+        el.textContent = Math.round(from + (to - from) * eased);
+        if (pct < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
 }
 
 // ════════════════════════════════════════════════════════
@@ -112,7 +142,6 @@ function initCursor() {
         cursor.style.top  = mouseY + 'px';
     });
 
-    // Follower with lerp
     (function animFollower() {
         fX += (mouseX - fX) * 0.15;
         fY += (mouseY - fY) * 0.15;
@@ -121,7 +150,6 @@ function initCursor() {
         requestAnimationFrame(animFollower);
     })();
 
-    // Scale on hover
     document.querySelectorAll('a, button, .task-card, .wallet-option').forEach(el => {
         el.addEventListener('mouseenter', () => {
             cursor.style.transform    = 'translate(-50%,-50%) scale(2.5)';
@@ -191,10 +219,9 @@ function initFireflies() {
 }
 
 // ════════════════════════════════════════════════════════
-// UNIVERSE SCENE (stars, leaves)
+// UNIVERSE SCENE
 // ════════════════════════════════════════════════════════
 function initUniverseScene() {
-    // Stars
     const starsLayer = document.getElementById('starsLayer');
     if (starsLayer) {
         for (let i = 0; i < 120; i++) {
@@ -212,7 +239,6 @@ function initUniverseScene() {
         }
     }
 
-    // Falling leaves
     const leavesContainer = document.getElementById('leavesContainer');
     if (leavesContainer) {
         for (let i = 0; i < 20; i++) {
@@ -294,7 +320,7 @@ function loadTasks() {
         const parsed = JSON.parse(saved);
         tasks = tasks.map(t => {
             const s = parsed.find(x => x.id === t.id);
-            return s ? { ...t, completed: s.completed } : t;
+            return s ? { ...t, completed: s.completed, proof: s.proof || '' } : t;
         });
     }
 }
@@ -306,20 +332,55 @@ function saveTasks() {
 function renderTasksSection() {
     const container = document.getElementById('tasksList');
     if (!container) return;
-    container.innerHTML = tasks.map(task => `
-        <div class="task-card ${task.completed ? 'completed' : ''}">
-            <div class="task-status">
-                ${task.completed ? '✅' : ''}
+    container.innerHTML = tasks.map((task, index) => `
+        <div class="task-card ${task.completed ? 'completed' : ''}" style="animation-delay:${index * 0.12}s">
+            <div class="task-status-icon">
+                ${task.completed
+                    ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+                    : `<span class="task-num">${index + 1}</span>`
+                }
             </div>
             <div class="task-info">
                 <div class="task-title">${task.title}</div>
+                ${task.requiresProof && !task.completed ? `
+                    <div class="task-proof-wrap">
+                        <div class="task-proof-row">
+                            <input type="url" id="proof_${task.id}" placeholder="🔗 Paste your tweet URL as proof..." class="task-proof-input">
+                            <button class="task-proof-open-btn" onclick="openTaskLink(${task.id}, '${task.link}')">Post Tweet ↗</button>
+                        </div>
+                        <p class="task-proof-hint">Post your tweet first, then paste the URL above</p>
+                    </div>
+                ` : ''}
+                ${task.proof && task.completed ? `
+                    <div class="task-proof-done">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        Proof: <a href="${task.proof}" target="_blank" rel="noopener">${task.proof.replace('https://', '').slice(0, 38)}…</a>
+                    </div>
+                ` : ''}
+                ${!task.completed && !task.requiresProof && !task.gameTask ? `
+                    <div class="task-click-hint">Click "Go & Done" — it'll mark automatically after you visit</div>
+                ` : ''}
             </div>
             <div class="task-action">
                 ${task.completed
-                    ? `<span style="font-family:var(--font-mono);font-size:0.78rem;color:var(--emerald);">DONE</span>`
+                    ? `<div class="task-done-badge">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            DONE
+                       </div>`
                     : task.gameTask
-                        ? `<button onclick="claimGameWL()">Verify WL</button>`
-                        : `<a href="${task.link}" target="_blank" onclick="markTask(${task.id})">Do Task</a>`
+                        ? `<button class="task-btn task-btn-game" onclick="claimGameWL()">
+                                <span>🎮 Verify WL</span>
+                           </button>`
+                        : task.requiresProof
+                            ? `<button class="task-btn task-btn-proof" onclick="submitProofTask(${task.id})">
+                                    <span>Submit</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                               </button>`
+                            : `<a href="${task.link}" target="_blank" rel="noopener"
+                                  class="task-btn task-btn-go"
+                                  onclick="scheduleAutoMark(${task.id}, event)">
+                                    Go & Done ↗
+                               </a>`
                 }
             </div>
         </div>
@@ -328,16 +389,60 @@ function renderTasksSection() {
     updateWlStatus();
 }
 
-function animateProgress() {
-    const done  = tasks.filter(t => t.completed).length;
-    const total = tasks.length;
-    const circle = document.getElementById('progressCircle');
-    const text   = document.getElementById('progressText');
-    if (!circle || !text) return;
-    const circumference = 314.16;
-    const pct = done / total;
-    circle.style.strokeDashoffset = circumference * (1 - pct);
-    text.textContent = `${done}/${total}`;
+// Opens link without marking (used for proof tasks)
+function openTaskLink(id, link) {
+    window.open(link, '_blank');
+}
+
+// For non-proof tasks: open link + auto-mark after 4 seconds
+function scheduleAutoMark(id, e) {
+    // Don't prevent default — link opens normally
+    const card = e.currentTarget.closest('.task-card');
+    if (card) {
+        card.classList.add('task-pending');
+        const btn = e.currentTarget;
+        btn.textContent = '⏳ Verifying...';
+        btn.style.pointerEvents = 'none';
+    }
+
+    setTimeout(() => {
+        const t = tasks.find(t => t.id === id);
+        if (t && !t.completed) {
+            t.completed = true;
+            saveTasks();
+            renderTasksSection();
+            renderModalTasks();
+            showToast('✅ Task completed!', 2500);
+        }
+    }, 4000);
+}
+
+// For proof task: validate URL and submit
+function submitProofTask(id) {
+    const input = document.getElementById(`proof_${id}`);
+    const proofUrl = input ? input.value.trim() : '';
+
+    if (!proofUrl) {
+        showToast('Please paste your tweet URL first!', 2500, 'error');
+        input && input.focus();
+        return;
+    }
+    if (!proofUrl.startsWith('http')) {
+        showToast('URL must start with https://...', 2500, 'error');
+        input && input.focus();
+        return;
+    }
+
+    const t = tasks.find(t => t.id === id);
+    if (t) {
+        t.completed = true;
+        t.proof = proofUrl;
+        saveTasks();
+        renderTasksSection();
+        renderModalTasks();
+        launchConfetti();
+        showToast('🎉 Proof submitted! Task complete.', 3000);
+    }
 }
 
 function markTask(id) {
@@ -352,6 +457,18 @@ function claimGameWL() {
         launchConfetti();
         showToast('🎉 Game WL Claimed! Spot secured.', 3000);
     }
+}
+
+function animateProgress() {
+    const done  = tasks.filter(t => t.completed).length;
+    const total = tasks.length;
+    const circle = document.getElementById('progressCircle');
+    const text   = document.getElementById('progressText');
+    if (!circle || !text) return;
+    const circumference = 314.16;
+    const pct = done / total;
+    circle.style.strokeDashoffset = circumference * (1 - pct);
+    text.textContent = `${done}/${total}`;
 }
 
 function updateWlStatus() {
@@ -369,8 +486,9 @@ function renderModalTasks() {
     const container = document.getElementById('modalTasksList');
     if (!container) return;
     container.innerHTML = tasks.map(task => `
-        <div class="modal-task-row">
-            <span>${task.completed ? '✅' : '⬜'} ${task.title}</span>
+        <div class="modal-task-row ${task.completed ? 'modal-task-done' : ''}">
+            <span class="modal-task-check">${task.completed ? '✅' : '⬜'}</span>
+            <span class="modal-task-label">${task.title}</span>
             ${!task.completed && !task.gameTask
                 ? `<button class="btn-sm-amber" onclick="markTask(${task.id})">Mark Done</button>`
                 : task.completed
@@ -382,7 +500,7 @@ function renderModalTasks() {
 }
 
 // ════════════════════════════════════════════════════════
-// WALLET MODULE — Base Chain
+// WALLET MODULE
 // ════════════════════════════════════════════════════════
 function openWalletModal() {
     document.getElementById('walletModal').classList.remove('hidden');
@@ -393,19 +511,15 @@ function closeWalletModal() {
 
 async function connectWithProvider(type) {
     if (!window.ethereum) {
-        // No injected wallet
         if (type === 'metamask') {
-            window.open('https://metamask.io/download/', '_blank');
-            return;
+            window.open('https://metamask.io/download/', '_blank'); return;
         } else if (type === 'coinbase') {
-            window.open('https://www.coinbase.com/wallet', '_blank');
-            return;
+            window.open('https://www.coinbase.com/wallet', '_blank'); return;
         }
         showToast('No wallet extension detected. Please install a wallet.', 3500, 'error');
         return;
     }
 
-    // Coinbase wallet: prefer coinbaseWalletExtension if available
     let provider = window.ethereum;
     if (type === 'coinbase' && window.ethereum.providers) {
         provider = window.ethereum.providers.find(p => p.isCoinbaseWallet) || window.ethereum;
@@ -416,15 +530,11 @@ async function connectWithProvider(type) {
 
     try {
         closeWalletModal();
-
-        // Request accounts
         await provider.request({ method: 'eth_requestAccounts' });
 
-        // Switch to Base
         const switched = await switchToBase(provider);
         if (!switched) {
-            showToast('Please switch to Base network to continue.', 3000, 'error');
-            return;
+            showToast('Please switch to Base network to continue.', 3000, 'error'); return;
         }
 
         const ethProvider = new ethers.BrowserProvider(provider);
@@ -438,7 +548,6 @@ async function connectWithProvider(type) {
 
         showToast(`✅ Wallet connected: ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`);
 
-        // Update modal wallet display
         const wad = document.getElementById('walletAddressDisplay');
         if (wad) wad.innerHTML = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`;
         const mws = document.getElementById('mintWalletShow');
@@ -513,6 +622,8 @@ function openMintModal() {
 
 function closeMintModal() {
     document.getElementById('mintModal').classList.add('hidden');
+    // Refresh minted count from DB after modal closes
+    fetchMintedCount();
 }
 
 function showMintStep() {
@@ -582,9 +693,6 @@ async function performMint() {
         showToast(`🎉 Belly Bear #${number} is yours!`, 4000);
         setTimeout(() => closeMintModal(), 2000);
 
-        const el = document.getElementById('mintedHero');
-        if (el) el.textContent = parseInt(el.textContent) + 1;
-
     } catch (err) {
         console.error(err);
         showToast('Mint failed. Please try again.', 3000, 'error');
@@ -609,7 +717,6 @@ async function buyPassWithUSDC() {
         openWalletModal(); return;
     }
 
-    // Ensure Base network
     const switched = await switchToBase();
     if (!switched) {
         showToast('Please switch to Base network!', 2500, 'error'); return;
@@ -625,7 +732,6 @@ async function buyPassWithUSDC() {
         const signer   = await provider.getSigner();
         const contract = new ethers.Contract(USDC_BASE, USDC_ABI, signer);
 
-        // USDC has 6 decimals
         const amount = ethers.parseUnits('2', 6);
         const tx     = await contract.transfer(TREASURY_ADDRESS, amount);
         btn.innerHTML = '⏳ Confirming transaction...';
