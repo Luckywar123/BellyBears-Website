@@ -388,62 +388,82 @@ async function fetchLeaderboard() {
     } catch { container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:12px;font-size:0.85rem;">Unable to load</div>'; }
 }
 
-// ════════════════════════════════════════════════════════
-// GLOBAL LEADERBOARD (paginated)
-// ════════════════════════════════════════════════════════
-let currentLeaderboardPage = 1;
-const LEADERBOARD_PAGE_SIZE = 20;
+// =============================================
+// LEADERBOARD BARU - GAME + REFERRAL
+// =============================================
 
-async function fetchGlobalLeaderboard(containerId, page = 1, isFullModal = false) {
-    if (!supabaseClient) return;
-    const container = document.getElementById(containerId);
-    if (!container) return;
+let currentLbTab = 0; // 0 = Game, 1 = Referral
+
+async function fetchLeaderboardData(tab) {
+    const container = document.getElementById('lbContent');
+    container.innerHTML = '<div style="text-align:center;padding:60px;color:#f59e0b">🐻 Loading leaderboard...</div>';
 
     try {
-        const from = (page - 1) * LEADERBOARD_PAGE_SIZE;
-        const to   = from + LEADERBOARD_PAGE_SIZE - 1;
-        const { data, error, count } = await supabaseClient
-            .from('highscores')
-            .select('username, best_score', { count: 'exact' })
-            .order('best_score', { ascending: false })
-            .range(from, to);
+        if (tab === 0) {
+            // === GAME LEADERBOARD ===
+            const { data } = await supabaseClient
+                .from('highscores')
+                .select('username, best_score')
+                .order('best_score', { ascending: false })
+                .limit(20);
 
-        if (error) throw error;
-        if (!data || data.length === 0) {
-            container.innerHTML = '<div class="lb-empty">No scores yet. Be the first!</div>';
-            return;
-        }
-        const startRank = (page - 1) * LEADERBOARD_PAGE_SIZE + 1;
-        container.innerHTML = data.map((p, idx) => {
-            const rank  = startRank + idx;
-            const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
-            const rowClass = rank <= 3 ? 'lb-row lb-row-top' : 'lb-row';
-            return `
-                <div class="${rowClass}" style="animation-delay:${idx*0.04}s">
-                    <div class="lb-rank">${medal}</div>
+            let html = `<h3 style="padding:0 28px 16px;color:#f59e0b;font-family:var(--font-display)">🏆 TOP PLAYERS</h3>`;
+            data.forEach((p, i) => {
+                const rank = i + 1;
+                html += `
+                <div class="lb-row ${rank<=3?'top-'+rank:''}">
+                    <div class="lb-rank">${rank===1?'👑':rank===2?'🥈':rank===3?'🥉':rank}</div>
                     <div class="lb-name">${p.username || 'Anonymous Bear'}</div>
-                    <div class="lb-score">${(p.best_score||0).toLocaleString()} pts</div>
-                </div>
-            `;
-        }).join('');
+                    <div class="lb-score">${p.best_score.toLocaleString()} pts</div>
+                </div>`;
+            });
+            container.innerHTML = html;
 
-        if (isFullModal && count) renderPagination(count, page);
-    } catch (err) {
-        container.innerHTML = '<div class="lb-empty">Failed to load leaderboard</div>';
+        } else {
+            // === REFERRAL LEADERBOARD ===
+            const { data } = await supabaseClient
+                .from('players')
+                .select('display_name, telegram_username, referral_count, bonus_coins')
+                .order('referral_count', { ascending: false })
+                .limit(20);
+
+            let html = `<h3 style="padding:0 28px 16px;color:#f59e0b;font-family:var(--font-display)">🔥 REFERRAL KINGS</h3>`;
+            data.forEach((p, i) => {
+                const rank = i + 1;
+                const reward = (p.referral_count * 0.02).toFixed(2);
+                html += `
+                <div class="lb-row ${rank<=3?'top-'+rank:''}">
+                    <div class="lb-rank honey-glow">${rank===1?'👑':rank===2?'🥈':rank===3?'🥉':rank}</div>
+                    <div class="lb-name">${p.display_name || p.telegram_username}</div>
+                    <div class="lb-referral">
+                        ${p.referral_count} referral<br>
+                        <small>${p.bonus_coins} coins</small>
+                    </div>
+                    <div class="lb-reward">+${reward} ETH</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+    } catch (e) {
+        container.innerHTML = `<div style="text-align:center;padding:60px;color:#ef4444">Gagal memuat data 😢</div>`;
     }
 }
 
-function renderPagination(totalItems, currentPage) {
-    const totalPages = Math.ceil(totalItems / LEADERBOARD_PAGE_SIZE);
-    const container  = document.getElementById('lbPagination');
-    if (!container) return;
-    if (totalPages <= 1) { container.innerHTML = ''; return; }
-    let buttons = '';
-    const max = Math.min(totalPages, 10);
-    for (let i = 1; i <= max; i++) {
-        buttons += `<button class="lb-page-btn ${i===currentPage?'active':''}" onclick="goToLeaderboardPage(${i})">${i}</button>`;
-    }
-    container.innerHTML = buttons;
+function switchLeaderboardTab(tab) {
+    currentLbTab = tab;
+    document.querySelectorAll('.lb-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById(tab === 0 ? 'tabGame' : 'tabReferral').classList.add('active');
+    fetchLeaderboardData(tab);
+}
+
+// Buka modal leaderboard
+function openFullLeaderboardModal() {
+    document.getElementById('fullLeaderboardModal').classList.remove('hidden');
+    switchLeaderboardTab(0); // default buka Game Leaderboard
+}
+
+function closeFullLeaderboardModal() {
+    document.getElementById('fullLeaderboardModal').classList.add('hidden');
 }
 
 function goToLeaderboardPage(page) {

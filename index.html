@@ -789,20 +789,28 @@
                     <h2 class="ref-title">Invite Friends, Earn Rewards</h2>
                 </div>
                 <p class="ref-desc">Share your unique referral link. When your friend mints a Belly Bear, you both get <strong>0.02 ETH</strong> bonus!</p>
-                <div class="ref-link-box">
-                    <input type="text" id="referralLinkInput" readonly class="ref-link-input">
-                    <button onclick="copyReferralLink()" class="ref-copy-btn">Copy</button>
-                </div>
-                <div class="ref-stats">
-                    <div class="ref-stat">
-                        <span class="ref-stat-num" id="refTotal">0</span>
-                        <span class="ref-stat-label">Total Referrals</span>
+                <!-- FULL LEADERBOARD MODAL - VERSI BARU & MENARIK -->
+                <div id="fullLeaderboardModal" class="modal-backdrop hidden" onclick="if(event.target===this)closeFullLeaderboardModal()">
+                    <div class="modal-box leaderboard-modal" onclick="event.stopPropagation()">
+                        <div class="modal-header">
+                            <h2>🏆 BELLY BEARS LEADERBOARD</h2>
+                            <button class="modal-close" onclick="closeFullLeaderboardModal()">✕</button>
+                        </div>
+
+                        <!-- TABS -->
+                        <div class="lb-tabs">
+                            <button onclick="switchLeaderboardTab(0)" id="tabGame" class="lb-tab active">🎮 Game Leaderboard</button>
+                            <button onclick="switchLeaderboardTab(1)" id="tabReferral" class="lb-tab">🔥 Referral Kings</button>
+                        </div>
+
+                        <div id="lbContent">
+                            <!-- Isi akan diisi oleh JS -->
+                        </div>
+
+                        <div class="lb-pagination" id="lbPagination"></div>
                     </div>
-                    <div class="ref-stat">
-                        <span class="ref-stat-num" id="refEarned">0</span>
-                        <span class="ref-stat-label">ETH Earned</span>
-                    </div>
                 </div>
+                
                 <div class="ref-note">* Rewards distributed after mint. Connect wallet to see your link.</div>
             </div>
 
