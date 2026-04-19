@@ -3007,3 +3007,21 @@ ul { list-style: none; }
     .countdown-section { padding: 48px 16px; }
     .mystery-orbit-ring { display: none; }
 }
+
+#stepContent1 ,btn-primary.btn-full,
+#stepContent1 button.btn-primary {
+    width: auto !important;
+    max-width: fit-content !important;
+    margin-left: auto !important;
+    display: block !important;
+    margin-top: 12px;
+}
+
+#stepContent1 .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(245,158,11,0.03);
+}
+
+.task-action .task-btn-proof {
+    margin-left: auto;
+}
