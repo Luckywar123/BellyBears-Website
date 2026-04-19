@@ -776,6 +776,54 @@
     </div>
 </section>
 
+
+<!-- ═══════════════════════════════════════════
+     REFERRAL & LEADERBOARD
+══════════════════════════════════════════════ -->
+<section id="referral" class="referral-section">
+    <div class="section-container">
+        <div class="referral-grid">
+            <div class="referral-card reveal-up">
+                <div class="ref-header">
+                    <span class="ref-icon">🔗</span>
+                    <h2 class="ref-title">Invite Friends, Earn Rewards</h2>
+                </div>
+                <p class="ref-desc">Share your unique referral link. When your friend mints a Belly Bear, you both get <strong>0.02 ETH</strong> bonus!</p>
+                <div class="ref-link-box">
+                    <input type="text" id="referralLinkInput" readonly class="ref-link-input">
+                    <button onclick="copyReferralLink()" class="ref-copy-btn">Copy</button>
+                </div>
+                <div class="ref-stats">
+                    <div class="ref-stat">
+                        <span class="ref-stat-num" id="refTotal">0</span>
+                        <span class="ref-stat-label">Total Referrals</span>
+                    </div>
+                    <div class="ref-stat">
+                        <span class="ref-stat-num" id="refEarned">0</span>
+                        <span class="ref-stat-label">ETH Earned</span>
+                    </div>
+                </div>
+                <div class="ref-note">* Rewards distributed after mint. Connect wallet to see your link.</div>
+            </div>
+
+            <div class="leaderboard-card reveal-up delay-1">
+                <div class="lb-header">
+                    <span class="lb-icon">🏆</span>
+                    <h2 class="lb-title">Global Leaderboard</h2>
+                    <button onclick="openFullLeaderboardModal()" class="lb-view-all">View All →</button>
+                </div>
+                <div id="globalLeaderboardList" class="lb-list">
+                    <div class="lb-skeleton"></div>
+                    <div class="lb-skeleton"></div>
+                    <div class="lb-skeleton"></div>
+                    <div class="lb-skeleton"></div>
+                    <div class="lb-skeleton"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- ═══════════════════════════════════════════
      TEAM
 ══════════════════════════════════════════════ -->
@@ -834,6 +882,54 @@
                 <summary>How to contact the team?</summary>
                 <p>Join our Telegram: <a href="https://t.me/bellybears_bot" target="_blank">t.me/bellybears_bot</a> or find us on X: <a href="https://x.com/belly_bears" target="_blank">@belly_bears</a></p>
             </details>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ═══════════════════════════════════════════
+     🍯 HONEY VAULT — Mystery Easter Egg
+     Reveals when all 5 tasks complete + wallet connected
+══════════════════════════════════════════════ -->
+<section id="mystery" class="mystery-section hidden">
+    <div class="mystery-void"></div>
+    <div class="mystery-stars-bg" id="mysteryStarsBg"></div>
+    <div class="mystery-orbit-ring"></div>
+    <div class="mystery-orbit-ring"></div>
+    <div class="mystery-orbit-ring"></div>
+    <div class="mystery-container">
+        <div class="mystery-inner">
+            <div class="mystery-icon-wrap">
+                <div class="mystery-icon-ring"></div>
+                <div class="mystery-icon-ring"></div>
+                <div class="mystery-icon-ring"></div>
+                <div class="mystery-main-icon">🍯</div>
+            </div>
+            <div class="mystery-eyebrow">⭐ — YOU FOUND IT — ⭐</div>
+            <h2 class="mystery-title">THE HONEY VAULT</h2>
+            <p class="mystery-subtitle">Only the most dedicated bears ever reach this place.<br>Most give up. You didn't.</p>
+            <div class="mystery-divider"><span>✦</span><span>✦</span><span>✦</span></div>
+            <div class="mystery-certificate">
+                <div class="mystery-cert-header">
+                    <span class="mystery-cert-label">🐻 CERTIFICATE OF LEGEND</span>
+                </div>
+                <p class="mystery-cert-text">
+                    You have completed <strong>all missions</strong>, proven your loyalty to the bears,
+                    and earned your place among the <strong>Genesis Legends</strong> —
+                    the founding few who built this community from nothing.
+                    <br><br>
+                    A mystery reward beyond the ordinary whitelist awaits you at mint.
+                    Your wallet has been marked. The bears remember.
+                </p>
+                <div class="mystery-cert-seal">
+                    <div class="mystery-seal-inner">🐻</div>
+                    <div class="mystery-seal-text">GENESIS LEGEND · BELLY BEARS</div>
+                </div>
+            </div>
+            <div class="mystery-hint">
+                <span class="mystery-hint-text">🔐 Your wallet has been flagged for something extraordinary at mint</span>
+            </div>
         </div>
     </div>
 </section>
@@ -1033,5 +1129,22 @@
 </audio>
 
 <script src="script.js"></script>
+
+
+<!-- FULL LEADERBOARD MODAL -->
+<div id="fullLeaderboardModal" class="modal-backdrop hidden" onclick="if(event.target===this)closeFullLeaderboardModal()">
+    <div class="modal-box leaderboard-modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <h2>🏆 Top Players — All Time</h2>
+            <button class="modal-close" onclick="closeFullLeaderboardModal()">✕</button>
+        </div>
+        <div id="fullLeaderboardList" class="full-lb-list">
+            <div class="lb-loading">Loading scores...</div>
+        </div>
+        <div class="lb-pagination" id="lbPagination"></div>
+    </div>
+</div>
+
+
 </body>
 </html>
