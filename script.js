@@ -768,7 +768,7 @@ async function linkTelegramAfterPayment() {
     btn.disabled  = true;
 
     try {
-        const expiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+        const expiry = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
         const { error } = await supabaseClient.from('belly_passes').insert({
             wallet_address:   userWalletAddress,
             telegram_username: username,
