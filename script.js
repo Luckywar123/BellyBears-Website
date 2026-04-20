@@ -1,7 +1,9 @@
 /* ═══════════════════════════════════════════════════════
-   BELLY BEARS — SCRIPT.JS v2.0
-   Fixed: Referral (players table) · Mystery System
-   New: Task 5 · Countdown · Highscore Modal · Animations
+   BELLY BEARS — SCRIPT.JS v2.1
+   FIXED  : removed duplicate `let currentLbTab = 0;`
+   FIXED  : removed duplicate openFullLeaderboardModal()
+   FIXED  : removed duplicate closeFullLeaderboardModal()
+   NEW    : chatbot init hooked in DOMContentLoaded
 ═══════════════════════════════════════════════════════ */
 
 // ── CONFIG ──────────────────────────────────────────────
@@ -99,13 +101,15 @@ window.addEventListener('DOMContentLoaded', () => {
     fetchMintedCount();
     initCountdown();
 
+    // NEW: init chatbot
+    if (typeof initChatbot === 'function') initChatbot();
+
     const saved = loadWalletSession();
     if (saved) {
         userWalletAddress = saved;
         walletConnected   = true;
         updateWalletUI();
         checkMyPass();
-        // Fetch referral data after wallet restore
         const tg = localStorage.getItem('bellyTgUsername');
         if (tg) fetchPlayerReferralData(tg);
     }
@@ -115,10 +119,9 @@ window.addEventListener('DOMContentLoaded', () => {
     const refCode   = urlParams.get('ref');
     if (refCode) sessionStorage.setItem('bellyRefCode', refCode);
 
-    // Check mystery on load (in case already completed)
     checkMysteryStatus();
 
-    console.log('%c🐻 Belly Bears v2.0 READY', 'color:#f59e0b;font-size:16px;font-weight:bold;');
+    console.log('%c🐻 Belly Bears v2.1 READY', 'color:#f59e0b;font-size:16px;font-weight:bold;');
 });
 
 // ════════════════════════════════════════════════════════
@@ -388,20 +391,19 @@ async function fetchLeaderboard() {
     } catch { container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:12px;font-size:0.85rem;">Unable to load</div>'; }
 }
 
-// =============================================
-// LEADERBOARD BARU - GAME + REFERRAL
-// =============================================
+// ════════════════════════════════════════════════════════
+// FULL LEADERBOARD — TABS (Game + Referral)
+// FIXED: removed duplicate `let currentLbTab = 0;`
+// ════════════════════════════════════════════════════════
 
-let currentLbTab = 0; // 0 = Game, 1 = Referral
-
-let currentLbTab = 0; // 0 = Game, 1 = Referral
+let currentLbTab = 0;           // 0 = Game, 1 = Referral
 let currentLeaderboardPage = 1;
- 
+
 async function fetchLeaderboardData(tab) {
     const container = document.getElementById('lbContent');
     if (!container) return;
     container.innerHTML = '<div class="lb-loading-state">🐻</div>';
- 
+
     try {
         if (tab === 0) {
             // ── GAME LEADERBOARD ──
@@ -410,12 +412,12 @@ async function fetchLeaderboardData(tab) {
                 .select('username, best_score')
                 .order('best_score', { ascending: false })
                 .limit(30);
- 
+
             if (error || !data || data.length === 0) {
                 container.innerHTML = '<div class="lb-empty-state">No scores yet. Be the first! 🐻</div>';
                 return;
             }
- 
+
             const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
             let html = '<div class="lb-section-title">🏆 TOP PLAYERS — ALL TIME</div>';
             data.forEach((p, i) => {
@@ -430,7 +432,7 @@ async function fetchLeaderboardData(tab) {
                 </div>`;
             });
             container.innerHTML = html;
- 
+
         } else {
             // ── REFERRAL LEADERBOARD ──
             const { data, error } = await supabaseClient
@@ -438,12 +440,12 @@ async function fetchLeaderboardData(tab) {
                 .select('display_name, telegram_username, referral_count, bonus_coins')
                 .order('referral_count', { ascending: false })
                 .limit(30);
- 
+
             if (error || !data || data.length === 0) {
                 container.innerHTML = '<div class="lb-empty-state">No referrals yet. Share your link! 🔗</div>';
                 return;
             }
- 
+
             const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
             let html = '<div class="lb-section-title">🔥 REFERRAL KINGS</div>';
             data.forEach((p, i) => {
@@ -479,6 +481,11 @@ function switchLeaderboardTab(tab) {
     fetchLeaderboardData(tab);
 }
 
+// ════════════════════════════════════════════════════════
+// OPEN / CLOSE FULL LEADERBOARD MODAL
+// FIXED: removed duplicate definitions — kept the tab-based version
+// REMOVED: old version that called fetchGlobalLeaderboard('fullLeaderboardList', ...)
+// ════════════════════════════════════════════════════════
 function openFullLeaderboardModal() {
     const modal = document.getElementById('fullLeaderboardModal');
     if (!modal) return;
@@ -487,7 +494,6 @@ function openFullLeaderboardModal() {
     switchLeaderboardTab(0);
 }
 
-
 function closeFullLeaderboardModal() {
     const modal = document.getElementById('fullLeaderboardModal');
     if (modal) modal.classList.add('hidden');
@@ -495,29 +501,29 @@ function closeFullLeaderboardModal() {
 
 function goToLeaderboardPage(page) {
     currentLeaderboardPage = page;
-    fetchGlobalLeaderboard('fullLeaderboardList', page, true);
+    fetchGlobalLeaderboard('globalLeaderboardList', page, true);
 }
 
 // ── fetchGlobalLeaderboard — mini list in referral section ──
 async function fetchGlobalLeaderboard(containerId, page = 1, isPaged = false) {
     const container = document.getElementById(containerId);
     if (!container || !supabaseClient) return;
- 
+
     const PAGE_SIZE = isPaged ? 20 : 5;
     const from = (page - 1) * PAGE_SIZE;
- 
+
     try {
         const { data, error } = await supabaseClient
             .from('highscores')
             .select('username, best_score')
             .order('best_score', { ascending: false })
             .range(from, from + PAGE_SIZE - 1);
- 
+
         if (error || !data || data.length === 0) {
             container.innerHTML = '<div class="lb-empty-state" style="padding:20px;text-align:center;color:var(--muted);font-size:0.85rem;">No scores yet 🐻</div>';
             return;
         }
- 
+
         const medals = ['🥇', '🥈', '🥉'];
         const offset  = from;
         container.innerHTML = data.map((p, i) => {
@@ -531,12 +537,11 @@ async function fetchGlobalLeaderboard(containerId, page = 1, isPaged = false) {
                 <span class="lb-score">${p.best_score.toLocaleString()} pts</span>
             </div>`;
         }).join('');
- 
-        // Pagination for full modal
+
         if (isPaged) {
             renderLbPagination(page, data.length, PAGE_SIZE);
         }
- 
+
     } catch (e) {
         console.error('fetchGlobalLeaderboard:', e);
         container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:16px;font-size:0.85rem;">Unable to load</div>';
@@ -547,7 +552,7 @@ function renderLbPagination(currentPage, resultCount, pageSize) {
     const el = document.getElementById('lbPagination');
     if (!el) return;
     if (resultCount < pageSize && currentPage === 1) { el.innerHTML = ''; return; }
- 
+
     const hasPrev = currentPage > 1;
     const hasNext = resultCount === pageSize;
     el.innerHTML = `
@@ -564,15 +569,6 @@ function escapeHtml(str) {
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
-}
-
-function openFullLeaderboardModal() {
-    document.getElementById('fullLeaderboardModal').classList.remove('hidden');
-    currentLeaderboardPage = 1;
-    fetchGlobalLeaderboard('fullLeaderboardList', 1, true);
-}
-function closeFullLeaderboardModal() {
-    document.getElementById('fullLeaderboardModal').classList.add('hidden');
 }
 
 // ════════════════════════════════════════════════════════
@@ -687,10 +683,7 @@ function submitProofTask(id) {
         t.completed = true;
         t.proof = proofUrl;
         saveTasks();
-
-        // Task 5: save proof to DB (uses tx_hash field as temporary proof store)
         if (t.saveToDb) saveProofToWhitelist(proofUrl);
-
         renderTasksSection();
         renderModalTasks();
         launchConfetti();
@@ -702,14 +695,12 @@ function submitProofTask(id) {
 async function saveProofToWhitelist(proofUrl) {
     if (!supabaseClient) return;
     try {
-        // If wallet connected and already has a claim, update tx_hash with proof
         if (userWalletAddress) {
             await supabaseClient
                 .from('whitelist_claims')
                 .update({ tx_hash: proofUrl })
                 .eq('wallet_address', userWalletAddress);
         }
-        // Also save to localStorage for later use in performMint
         localStorage.setItem('bellyProofTweet', proofUrl);
     } catch (e) { console.warn('saveProofToWhitelist:', e); }
 }
@@ -782,7 +773,6 @@ function checkMysteryStatus() {
         mysteryUnlocked = true;
         setTimeout(revealMystery, 800);
     } else if (allDone && !mysteryUnlocked) {
-        // Show hint even without wallet
         const hint = document.getElementById('mysteryHintBar');
         if (hint) {
             hint.classList.remove('hidden');
@@ -794,18 +784,14 @@ function checkMysteryStatus() {
 function revealMystery() {
     const section = document.getElementById('mystery');
     if (!section) return;
-
     section.classList.remove('hidden');
     section.classList.add('mystery-reveal');
     initMysteryStars();
-
     setTimeout(() => {
         section.scrollIntoView({ behavior: 'smooth', block: 'center' });
         launchConfetti();
         showToast('⭐ You unlocked the Honey Vault...', 6000);
     }, 600);
-
-    // Mark genesis legend in DB
     if (supabaseClient && userWalletAddress) {
         supabaseClient.from('whitelist_claims')
             .update({ tasks_completed: 5 })
@@ -869,19 +855,15 @@ async function connectWithProvider(type) {
         updateWalletUI();
         checkMyPass();
 
-        // Show in modal
         const wad = document.getElementById('walletAddressDisplay');
         if (wad) wad.innerHTML = `✅ ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`;
         const mws = document.getElementById('mintWalletShow');
         if (mws) mws.textContent = userWalletAddress.slice(0,6) + '...' + userWalletAddress.slice(-4);
 
-        // Fetch referral data
         const tg = localStorage.getItem('bellyTgUsername');
         if (tg) fetchPlayerReferralData(tg);
 
         showToast(`✅ Wallet connected: ${userWalletAddress.slice(0,6)}...${userWalletAddress.slice(-4)}`);
-
-        // Check mystery after wallet connect
         checkMysteryStatus();
 
     } catch (err) {
@@ -942,11 +924,6 @@ function logoutWallet(e) {
 // ════════════════════════════════════════════════════════
 // REFERRAL SYSTEM — Uses `players` table
 // ════════════════════════════════════════════════════════
-
-/**
- * Fetch referral data from the `players` table using Telegram username.
- * players columns: telegram_username, referral_code, referral_count, bonus_coins
- */
 async function fetchPlayerReferralData(tgUsername) {
     const el = document.getElementById('referralLinkInput');
     if (!el) return;
@@ -977,7 +954,6 @@ async function fetchPlayerReferralData(tgUsername) {
             if (elTotal)  animateCounter(elTotal, 0, total, 600);
             if (elEarned) elEarned.textContent = earned;
         } else {
-            // Player not found in game yet — use wallet address as fallback
             const fallback = userWalletAddress
                 ? `${window.location.origin}?ref=${userWalletAddress.slice(2,10).toUpperCase()}`
                 : `${window.location.origin}?ref=${tgUsername.replace('@','')}`;
@@ -988,10 +964,6 @@ async function fetchPlayerReferralData(tgUsername) {
     }
 }
 
-/**
- * Track referral when a new user mints/claims.
- * Increments referral_count on the referrer's players row.
- */
 async function trackReferralOnMint(tgUsername) {
     const refCode = sessionStorage.getItem('bellyRefCode');
     if (!refCode || !supabaseClient) return;
@@ -1005,17 +977,14 @@ async function trackReferralOnMint(tgUsername) {
 
         if (!referrer) return;
 
-        // Don't self-refer
         const cleanTg = (tgUsername || '').replace('@','').toLowerCase();
         if (referrer.telegram_username?.toLowerCase() === cleanTg) return;
 
-        // Increment referrer's count
         await supabaseClient
             .from('players')
             .update({ referral_count: (referrer.referral_count || 0) + 1 })
             .eq('id', referrer.id);
 
-        // Update referred_by on new player (if they exist in players table)
         if (tgUsername) {
             await supabaseClient
                 .from('players')
@@ -1118,17 +1087,14 @@ async function performMint() {
             telegram:        tgUsername,
             bear_number:     number,
             tasks_completed: tasks.filter(t => t.completed).length,
-            tx_hash:         proofTweet   // store tweet proof in tx_hash until real mint
+            tx_hash:         proofTweet
         });
         if (error) throw error;
 
-        // Track referral
         await trackReferralOnMint(tgUsername);
 
         launchConfetti();
         showToast(`🎉 Belly Bear #${number} is yours!`, 4000);
-
-        // Check mystery after successful claim
         checkMysteryStatus();
 
         setTimeout(() => closeMintModal(), 2000);
