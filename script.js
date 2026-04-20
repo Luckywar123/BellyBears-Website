@@ -394,81 +394,176 @@ async function fetchLeaderboard() {
 
 let currentLbTab = 0; // 0 = Game, 1 = Referral
 
+let currentLbTab = 0; // 0 = Game, 1 = Referral
+let currentLeaderboardPage = 1;
+ 
 async function fetchLeaderboardData(tab) {
     const container = document.getElementById('lbContent');
-    container.innerHTML = '<div style="text-align:center;padding:60px;color:#f59e0b">🐻 Loading leaderboard...</div>';
-
+    if (!container) return;
+    container.innerHTML = '<div class="lb-loading-state">🐻</div>';
+ 
     try {
         if (tab === 0) {
-            // === GAME LEADERBOARD ===
-            const { data } = await supabaseClient
+            // ── GAME LEADERBOARD ──
+            const { data, error } = await supabaseClient
                 .from('highscores')
                 .select('username, best_score')
                 .order('best_score', { ascending: false })
-                .limit(20);
-
-            let html = `<h3 style="padding:0 28px 16px;color:#f59e0b;font-family:var(--font-display)">🏆 TOP PLAYERS</h3>`;
+                .limit(30);
+ 
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<div class="lb-empty-state">No scores yet. Be the first! 🐻</div>';
+                return;
+            }
+ 
+            const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+            let html = '<div class="lb-section-title">🏆 TOP PLAYERS — ALL TIME</div>';
             data.forEach((p, i) => {
                 const rank = i + 1;
+                const rankDisplay = medals[rank] || rank;
+                const topClass = rank <= 3 ? `top-${rank}` : '';
                 html += `
-                <div class="lb-row ${rank<=3?'top-'+rank:''}">
-                    <div class="lb-rank">${rank===1?'👑':rank===2?'🥈':rank===3?'🥉':rank}</div>
-                    <div class="lb-name">${p.username || 'Anonymous Bear'}</div>
-                    <div class="lb-score">${p.best_score.toLocaleString()} pts</div>
+                <div class="lb-row-card ${topClass}" style="animation-delay:${i * 0.04}s">
+                    <div class="lb-card-rank">${rankDisplay}</div>
+                    <div class="lb-card-name">${escapeHtml(p.username || 'Anonymous Bear')}</div>
+                    <div class="lb-card-score">${p.best_score.toLocaleString()} pts</div>
                 </div>`;
             });
             container.innerHTML = html;
-
+ 
         } else {
-            // === REFERRAL LEADERBOARD ===
-            const { data } = await supabaseClient
+            // ── REFERRAL LEADERBOARD ──
+            const { data, error } = await supabaseClient
                 .from('players')
                 .select('display_name, telegram_username, referral_count, bonus_coins')
                 .order('referral_count', { ascending: false })
-                .limit(20);
-
-            let html = `<h3 style="padding:0 28px 16px;color:#f59e0b;font-family:var(--font-display)">🔥 REFERRAL KINGS</h3>`;
+                .limit(30);
+ 
+            if (error || !data || data.length === 0) {
+                container.innerHTML = '<div class="lb-empty-state">No referrals yet. Share your link! 🔗</div>';
+                return;
+            }
+ 
+            const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+            let html = '<div class="lb-section-title">🔥 REFERRAL KINGS</div>';
             data.forEach((p, i) => {
                 const rank = i + 1;
-                const reward = (p.referral_count * 0.02).toFixed(2);
+                const rankDisplay = medals[rank] || rank;
+                const topClass = rank <= 3 ? `top-${rank}` : '';
+                const name = escapeHtml(p.display_name || p.telegram_username || 'Bear');
+                const reward = ((p.referral_count || 0) * 0.02).toFixed(3);
+                const coins  = p.bonus_coins || 0;
                 html += `
-                <div class="lb-row ${rank<=3?'top-'+rank:''}">
-                    <div class="lb-rank honey-glow">${rank===1?'👑':rank===2?'🥈':rank===3?'🥉':rank}</div>
-                    <div class="lb-name">${p.display_name || p.telegram_username}</div>
-                    <div class="lb-referral">
-                        ${p.referral_count} referral<br>
-                        <small>${p.bonus_coins} coins</small>
+                <div class="lb-row-card ${topClass}" style="animation-delay:${i * 0.04}s">
+                    <div class="lb-card-rank">${rankDisplay}</div>
+                    <div class="lb-card-name">
+                        ${name}
+                        <span class="lb-card-sub">${p.referral_count || 0} referral${(p.referral_count || 0) !== 1 ? 's' : ''} · ${coins} coins</span>
                     </div>
-                    <div class="lb-reward">+${reward} ETH</div>
+                    <div class="lb-card-reward">+${reward} ETH</div>
                 </div>`;
             });
             container.innerHTML = html;
         }
     } catch (e) {
-        container.innerHTML = `<div style="text-align:center;padding:60px;color:#ef4444">Gagal memuat data 😢</div>`;
+        console.error('fetchLeaderboardData:', e);
+        container.innerHTML = '<div class="lb-empty-state">Failed to load. Try again 🐻</div>';
     }
 }
 
 function switchLeaderboardTab(tab) {
     currentLbTab = tab;
     document.querySelectorAll('.lb-tab').forEach(el => el.classList.remove('active'));
-    document.getElementById(tab === 0 ? 'tabGame' : 'tabReferral').classList.add('active');
+    const activeTab = document.getElementById(tab === 0 ? 'tabGame' : 'tabReferral');
+    if (activeTab) activeTab.classList.add('active');
     fetchLeaderboardData(tab);
 }
 
-// Buka modal leaderboard
 function openFullLeaderboardModal() {
-    document.getElementById('fullLeaderboardModal').classList.remove('hidden');
-    switchLeaderboardTab(0); // default buka Game Leaderboard
+    const modal = document.getElementById('fullLeaderboardModal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    currentLbTab = 0;
+    switchLeaderboardTab(0);
 }
 
+
 function closeFullLeaderboardModal() {
-    document.getElementById('fullLeaderboardModal').classList.add('hidden');
+    const modal = document.getElementById('fullLeaderboardModal');
+    if (modal) modal.classList.add('hidden');
 }
 
 function goToLeaderboardPage(page) {
     currentLeaderboardPage = page;
     fetchGlobalLeaderboard('fullLeaderboardList', page, true);
+}
+
+// ── fetchGlobalLeaderboard — mini list in referral section ──
+async function fetchGlobalLeaderboard(containerId, page = 1, isPaged = false) {
+    const container = document.getElementById(containerId);
+    if (!container || !supabaseClient) return;
+ 
+    const PAGE_SIZE = isPaged ? 20 : 5;
+    const from = (page - 1) * PAGE_SIZE;
+ 
+    try {
+        const { data, error } = await supabaseClient
+            .from('highscores')
+            .select('username, best_score')
+            .order('best_score', { ascending: false })
+            .range(from, from + PAGE_SIZE - 1);
+ 
+        if (error || !data || data.length === 0) {
+            container.innerHTML = '<div class="lb-empty-state" style="padding:20px;text-align:center;color:var(--muted);font-size:0.85rem;">No scores yet 🐻</div>';
+            return;
+        }
+ 
+        const medals = ['🥇', '🥈', '🥉'];
+        const offset  = from;
+        container.innerHTML = data.map((p, i) => {
+            const rank  = offset + i + 1;
+            const medal = rank <= 3 ? medals[rank - 1] : rank;
+            const topCls = rank <= 3 ? 'lb-row-top' : '';
+            return `
+            <div class="lb-row ${topCls}" style="animation-delay:${i * 0.06}s">
+                <span class="lb-rank">${medal}</span>
+                <span class="lb-name">${escapeHtml(p.username || 'Anonymous Bear')}</span>
+                <span class="lb-score">${p.best_score.toLocaleString()} pts</span>
+            </div>`;
+        }).join('');
+ 
+        // Pagination for full modal
+        if (isPaged) {
+            renderLbPagination(page, data.length, PAGE_SIZE);
+        }
+ 
+    } catch (e) {
+        console.error('fetchGlobalLeaderboard:', e);
+        container.innerHTML = '<div style="color:var(--muted);text-align:center;padding:16px;font-size:0.85rem;">Unable to load</div>';
+    }
+}
+
+function renderLbPagination(currentPage, resultCount, pageSize) {
+    const el = document.getElementById('lbPagination');
+    if (!el) return;
+    if (resultCount < pageSize && currentPage === 1) { el.innerHTML = ''; return; }
+ 
+    const hasPrev = currentPage > 1;
+    const hasNext = resultCount === pageSize;
+    el.innerHTML = `
+        ${hasPrev ? `<button class="lb-page-btn" onclick="goToLeaderboardPage(${currentPage - 1})">← Prev</button>` : ''}
+        <button class="lb-page-btn active">${currentPage}</button>
+        ${hasNext ? `<button class="lb-page-btn" onclick="goToLeaderboardPage(${currentPage + 1})">Next →</button>` : ''}
+    `;
+}
+
+// ── Escape HTML helper ──
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
 }
 
 function openFullLeaderboardModal() {
