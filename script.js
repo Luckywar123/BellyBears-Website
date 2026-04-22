@@ -1,9 +1,8 @@
 /* ═══════════════════════════════════════════════════════
-   BELLY BEARS — SCRIPT.JS v2.1
+   BELLY BEARS — SCRIPT.JS v2.2
+   FIXED  : renderModalTasks() shows proof input + Submit
    FIXED  : removed duplicate `let currentLbTab = 0;`
-   FIXED  : removed duplicate openFullLeaderboardModal()
-   FIXED  : removed duplicate closeFullLeaderboardModal()
-   NEW    : chatbot init hooked in DOMContentLoaded
+   NEW    : inline big leaderboard with tabs (switchInlineTab)
 ═══════════════════════════════════════════════════════ */
 
 // ── CONFIG ──────────────────────────────────────────────
@@ -34,6 +33,11 @@ let currentPassTxHash  = null;
 let isMusicPlaying     = false;
 let mysteryUnlocked    = false;
 let playerReferralCode = null;
+
+// Leaderboard state
+let currentLbTab        = 0;  // 0 = Game, 1 = Referral (modal)
+let currentInlineLbTab  = 0;  // 0 = Game, 1 = Referral (inline/page)
+let currentLeaderboardPage = 1;
 
 const TASKS_KEY = 'bellyBearsTasks_v2';
 
@@ -96,7 +100,7 @@ window.addEventListener('DOMContentLoaded', () => {
     renderTasksSection();
     animateProgress();
     fetchLeaderboard();
-    fetchGlobalLeaderboard('globalLeaderboardList', 1);
+    initInlineLeaderboard();
     initRandBearNumber();
     fetchMintedCount();
     initCountdown();
@@ -121,7 +125,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     checkMysteryStatus();
 
-    console.log('%c🐻 Belly Bears v2.1 READY', 'color:#f59e0b;font-size:16px;font-weight:bold;');
+    console.log('%c🐻 Belly Bears v2.2 READY', 'color:#f59e0b;font-size:16px;font-weight:bold;');
 });
 
 // ════════════════════════════════════════════════════════
@@ -383,7 +387,7 @@ async function fetchLeaderboard() {
                 <div style="display:flex;align-items:center;gap:10px;">
                     <span style="font-size:1.1rem;">${medals[i]}</span>
                     <span class="mini-lb-rank">#${i+1}</span>
-                    <span style="font-size:0.88rem;">${p.username || 'Bear'}</span>
+                    <span style="font-size:0.88rem;">${escapeHtml(p.username || 'Bear')}</span>
                 </div>
                 <span style="font-family:var(--font-mono);font-size:0.85rem;color:var(--amber);">${p.best_score} pts</span>
             </div>
@@ -392,13 +396,174 @@ async function fetchLeaderboard() {
 }
 
 // ════════════════════════════════════════════════════════
-// FULL LEADERBOARD — TABS (Game + Referral)
-// FIXED: removed duplicate `let currentLbTab = 0;`
+// INLINE BIG LEADERBOARD (page section, not modal)
 // ════════════════════════════════════════════════════════
+function initInlineLeaderboard() {
+    switchInlineTab(0);
+}
 
-let currentLbTab = 0;           // 0 = Game, 1 = Referral
-let currentLeaderboardPage = 1;
+async function switchInlineTab(tab) {
+    currentInlineLbTab = tab;
 
+    // Update tab buttons
+    document.querySelectorAll('.big-lb-tab').forEach(el => el.classList.remove('active'));
+    const activeTab = document.getElementById(tab === 0 ? 'inlineTabGame' : 'inlineTabReferral');
+    if (activeTab) activeTab.classList.add('active');
+
+    // Update score column label
+    const scoreLabel = document.getElementById('blhScoreLabel');
+    if (scoreLabel) scoreLabel.textContent = tab === 0 ? 'SCORE' : 'REFERRALS';
+
+    await loadInlineLeaderboardData(tab);
+}
+
+async function loadInlineLeaderboardData(tab) {
+    const podiumEl = document.getElementById('bigLbPodium');
+    const listEl   = document.getElementById('bigLbList');
+    const totalEl  = document.getElementById('lbTotalPlayers');
+
+    if (!podiumEl || !listEl) return;
+
+    // Show skeletons
+    listEl.innerHTML = Array(7).fill('<div class="big-lb-skeleton"></div>').join('');
+    podiumEl.innerHTML = '<div class="podium-skeleton"></div>';
+
+    if (!supabaseClient) {
+        listEl.innerHTML = '<div class="big-lb-empty">Connect to database to load rankings 🐻</div>';
+        podiumEl.innerHTML = '';
+        return;
+    }
+
+    try {
+        if (tab === 0) {
+            // ── GAME SCORES ──
+            const { data, error, count } = await supabaseClient
+                .from('highscores')
+                .select('username, best_score', { count: 'exact' })
+                .order('best_score', { ascending: false })
+                .limit(50);
+
+            if (error || !data || !data.length) {
+                podiumEl.innerHTML = '';
+                listEl.innerHTML = '<div class="big-lb-empty">No scores yet. Be the first bear! 🐻</div>';
+                return;
+            }
+
+            if (totalEl) totalEl.textContent = count || data.length;
+
+            // Render podium (top 3)
+            const top3   = data.slice(0, 3);
+            const medals = ['🥇','🥈','🥉'];
+            const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+            const podiumPositions = top3.length >= 2
+                ? ['podium-2nd', 'podium-1st', 'podium-3rd']
+                : ['podium-1st'];
+
+            podiumEl.innerHTML = podiumOrder.map((p, i) => {
+                const origRank = top3.indexOf(p) + 1;
+                const heights  = ['podium-h-2nd', 'podium-h-1st', 'podium-h-3rd'];
+                return `
+                <div class="podium-player ${podiumPositions[i]}">
+                    <div class="podium-avatar">${medals[origRank - 1]}</div>
+                    <div class="podium-name">${escapeHtml(p.username || 'Bear').slice(0, 14)}</div>
+                    <div class="podium-score">${p.best_score.toLocaleString()}<span> pts</span></div>
+                    <div class="podium-stand ${heights[i]}">
+                        <div class="podium-rank-num">#${origRank}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Render list (4th onward)
+            const rest = data.slice(3);
+            if (!rest.length) {
+                listEl.innerHTML = '<div class="big-lb-empty" style="padding:20px;font-size:0.82rem;color:var(--muted);">Only 3 players so far — join the leaderboard!</div>';
+                return;
+            }
+            listEl.innerHTML = rest.map((p, i) => {
+                const rank = i + 4;
+                return `
+                <div class="big-lb-row" style="animation-delay:${i * 0.035}s">
+                    <div class="blr-rank">#${rank}</div>
+                    <div class="blr-name">${escapeHtml(p.username || 'Anonymous Bear')}</div>
+                    <div class="blr-score">${p.best_score.toLocaleString()} pts</div>
+                    <div class="blr-reward">${rank <= 10 ? '<span class="blr-wl-badge">🎟 WL</span>' : '—'}</div>
+                </div>`;
+            }).join('');
+
+        } else {
+            // ── REFERRAL KINGS ──
+            const { data, error, count } = await supabaseClient
+                .from('players')
+                .select('display_name, telegram_username, referral_count, bonus_coins', { count: 'exact' })
+                .order('referral_count', { ascending: false })
+                .limit(50);
+
+            if (error || !data || !data.length) {
+                podiumEl.innerHTML = '';
+                listEl.innerHTML = '<div class="big-lb-empty">No referrals yet. Share your link! 🔗</div>';
+                return;
+            }
+
+            if (totalEl) totalEl.textContent = count || data.length;
+
+            // Render podium (top 3)
+            const top3   = data.slice(0, 3);
+            const medals = ['🥇','🥈','🥉'];
+            const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
+            const podiumPositions = ['podium-2nd', 'podium-1st', 'podium-3rd'];
+
+            podiumEl.innerHTML = podiumOrder.map((p, i) => {
+                const origRank  = top3.indexOf(p) + 1;
+                const heights   = ['podium-h-2nd', 'podium-h-1st', 'podium-h-3rd'];
+                const name      = escapeHtml(p.display_name || p.telegram_username || 'Bear').slice(0, 14);
+                const refs      = p.referral_count || 0;
+                const reward    = (refs * 0.02).toFixed(3);
+                return `
+                <div class="podium-player ${podiumPositions[i]}">
+                    <div class="podium-avatar">${medals[origRank - 1]}</div>
+                    <div class="podium-name">${name}</div>
+                    <div class="podium-score">${refs}<span> refs</span></div>
+                    <div class="podium-stand ${heights[i]}">
+                        <div class="podium-rank-num">#${origRank}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Render list (4th onward)
+            const rest = data.slice(3);
+            if (!rest.length) {
+                listEl.innerHTML = '<div class="big-lb-empty" style="padding:20px;font-size:0.82rem;color:var(--muted);">Only 3 players so far — share your link!</div>';
+                return;
+            }
+            listEl.innerHTML = rest.map((p, i) => {
+                const rank   = i + 4;
+                const name   = escapeHtml(p.display_name || p.telegram_username || 'Anonymous Bear');
+                const refs   = p.referral_count || 0;
+                const coins  = p.bonus_coins || 0;
+                const reward = (refs * 0.02).toFixed(3);
+                return `
+                <div class="big-lb-row" style="animation-delay:${i * 0.035}s">
+                    <div class="blr-rank">#${rank}</div>
+                    <div class="blr-name">
+                        ${name}
+                        <span class="blr-sub">${coins} coins</span>
+                    </div>
+                    <div class="blr-score">${refs} ref${refs !== 1 ? 's' : ''}</div>
+                    <div class="blr-reward"><span class="blr-eth">+${reward} ETH</span></div>
+                </div>`;
+            }).join('');
+        }
+
+    } catch (e) {
+        console.error('loadInlineLeaderboardData:', e);
+        podiumEl.innerHTML = '';
+        listEl.innerHTML = '<div class="big-lb-empty">Failed to load. Try again 🐻</div>';
+    }
+}
+
+// ════════════════════════════════════════════════════════
+// FULL LEADERBOARD MODAL — tabs
+// ════════════════════════════════════════════════════════
 async function fetchLeaderboardData(tab) {
     const container = document.getElementById('lbContent');
     if (!container) return;
@@ -406,7 +571,6 @@ async function fetchLeaderboardData(tab) {
 
     try {
         if (tab === 0) {
-            // ── GAME LEADERBOARD ──
             const { data, error } = await supabaseClient
                 .from('highscores')
                 .select('username, best_score')
@@ -434,7 +598,6 @@ async function fetchLeaderboardData(tab) {
             container.innerHTML = html;
 
         } else {
-            // ── REFERRAL LEADERBOARD ──
             const { data, error } = await supabaseClient
                 .from('players')
                 .select('display_name, telegram_username, referral_count, bonus_coins')
@@ -481,11 +644,6 @@ function switchLeaderboardTab(tab) {
     fetchLeaderboardData(tab);
 }
 
-// ════════════════════════════════════════════════════════
-// OPEN / CLOSE FULL LEADERBOARD MODAL
-// FIXED: removed duplicate definitions — kept the tab-based version
-// REMOVED: old version that called fetchGlobalLeaderboard('fullLeaderboardList', ...)
-// ════════════════════════════════════════════════════════
 function openFullLeaderboardModal() {
     const modal = document.getElementById('fullLeaderboardModal');
     if (!modal) return;
@@ -504,7 +662,6 @@ function goToLeaderboardPage(page) {
     fetchGlobalLeaderboard('globalLeaderboardList', page, true);
 }
 
-// ── fetchGlobalLeaderboard — mini list in referral section ──
 async function fetchGlobalLeaderboard(containerId, page = 1, isPaged = false) {
     const container = document.getElementById(containerId);
     if (!container || !supabaseClient) return;
@@ -562,7 +719,6 @@ function renderLbPagination(currentPage, resultCount, pageSize) {
     `;
 }
 
-// ── Escape HTML helper ──
 function escapeHtml(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -692,6 +848,27 @@ function submitProofTask(id) {
     }
 }
 
+// Submit proof from MODAL
+function submitModalProofTask(id) {
+    const input    = document.getElementById(`modal_proof_${id}`);
+    const proofUrl = input ? input.value.trim() : '';
+    if (!proofUrl) { showToast('Please paste your tweet URL first!', 2500, 'error'); input?.focus(); return; }
+    if (!proofUrl.startsWith('http')) { showToast('URL must start with https://...', 2500, 'error'); input?.focus(); return; }
+
+    const t = tasks.find(t => t.id === id);
+    if (t) {
+        t.completed = true;
+        t.proof = proofUrl;
+        saveTasks();
+        if (t.saveToDb) saveProofToWhitelist(proofUrl);
+        renderTasksSection();
+        renderModalTasks();
+        launchConfetti();
+        showToast('🎉 Proof submitted! Task complete.', 3000);
+        checkMysteryStatus();
+    }
+}
+
 async function saveProofToWhitelist(proofUrl) {
     if (!supabaseClient) return;
     try {
@@ -745,25 +922,68 @@ function updateWlStatus() {
     }
 }
 
+// ════════════════════════════════════════════════════════
+// renderModalTasks — FIXED: shows proof input + Submit btn
+// ════════════════════════════════════════════════════════
 function renderModalTasks() {
     const container = document.getElementById('modalTasksList');
     if (!container) return;
-    container.innerHTML = tasks.map(task => `
-        <div class="modal-task-row ${task.completed ? 'modal-task-done' : ''}">
-            <span class="modal-task-check">${task.completed ? '✅' : '⬜'}</span>
-            <span class="modal-task-label">${task.title}</span>
-            ${!task.completed && !task.gameTask
-                ? `<button class="btn-sm-amber" onclick="markTask(${task.id})">Mark Done</button>`
-                : task.completed
-                    ? `<span style="color:var(--emerald);font-size:0.8rem;font-family:var(--font-mono);">DONE</span>`
-                    : ''
-            }
-        </div>
-    `).join('');
+    container.innerHTML = tasks.map(task => {
+        if (task.completed) {
+            return `
+            <div class="modal-task-row modal-task-done">
+                <span class="modal-task-check">✅</span>
+                <span class="modal-task-label">${task.icon ? task.icon + ' ' : ''}${task.title}</span>
+                <span style="color:var(--emerald);font-size:0.8rem;font-family:var(--font-mono);flex-shrink:0;">DONE</span>
+            </div>`;
+        }
+
+        if (task.gameTask) {
+            return `
+            <div class="modal-task-row">
+                <span class="modal-task-check">⬜</span>
+                <span class="modal-task-label">${task.icon ? task.icon + ' ' : ''}${task.title}</span>
+                <button class="btn-sm-amber" onclick="claimGameWL()" style="flex-shrink:0;">Verify</button>
+            </div>`;
+        }
+
+        if (task.requiresProof) {
+            return `
+            <div class="modal-task-row modal-task-proof-wrap" style="flex-direction:column;align-items:stretch;gap:8px;">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span class="modal-task-check">⬜</span>
+                    <span class="modal-task-label">${task.icon ? task.icon + ' ' : ''}${task.title}</span>
+                    <a href="${task.link}" target="_blank" rel="noopener" class="btn-sm-amber" style="flex-shrink:0;font-size:0.78rem;padding:7px 12px;">Go ↗</a>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <input type="url" id="modal_proof_${task.id}" placeholder="Paste tweet URL..." 
+                        class="task-proof-input" style="flex:1;font-size:0.8rem;" 
+                        value="${task.proof || ''}">
+                    <button onclick="submitModalProofTask(${task.id})" 
+                        class="task-btn task-btn-proof" style="padding:8px 14px;font-size:0.82rem;border-radius:10px;">
+                        Submit ✓
+                    </button>
+                </div>
+            </div>`;
+        }
+
+        // Regular task (auto-mark)
+        return `
+        <div class="modal-task-row">
+            <span class="modal-task-check">⬜</span>
+            <span class="modal-task-label">${task.icon ? task.icon + ' ' : ''}${task.title}</span>
+            <a href="${task.link}" target="_blank" rel="noopener" 
+                class="btn-sm-amber" 
+                onclick="setTimeout(()=>{ markTask(${task.id}); }, 3500); return true;"
+                style="flex-shrink:0;font-size:0.78rem;padding:7px 12px;">
+                Go & Done
+            </a>
+        </div>`;
+    }).join('');
 }
 
 // ════════════════════════════════════════════════════════
-// MYSTERY SYSTEM — Honey Vault Easter Egg
+// MYSTERY SYSTEM
 // ════════════════════════════════════════════════════════
 function checkMysteryStatus() {
     const allDone   = tasks.every(t => t.completed);
@@ -819,7 +1039,7 @@ function initMysteryStars() {
 }
 
 // ════════════════════════════════════════════════════════
-// WALLET MODULE
+// WALLET
 // ════════════════════════════════════════════════════════
 function openWalletModal() {
     document.getElementById('walletModal').classList.remove('hidden');
@@ -922,7 +1142,7 @@ function logoutWallet(e) {
 }
 
 // ════════════════════════════════════════════════════════
-// REFERRAL SYSTEM — Uses `players` table
+// REFERRAL SYSTEM
 // ════════════════════════════════════════════════════════
 async function fetchPlayerReferralData(tgUsername) {
     const el = document.getElementById('referralLinkInput');

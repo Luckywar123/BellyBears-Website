@@ -581,30 +581,82 @@
 </section>
 
 <!-- ═══════════════════════════════════════════
-     REFERRAL & LEADERBOARD
+     REFERRAL & LEADERBOARD — REDESIGNED BIG
 ══════════════════════════════════════════════ -->
 <section id="referral" class="referral-section">
     <div class="section-container">
-        <div class="referral-grid">
 
-            
-            <!-- LEADERBOARD CARD -->
-            <div class="leaderboard-card reveal-up delay-1">
-                <div class="lb-header">
-                    <span class="lb-icon">🏆</span>
-                    <h2 class="lb-title">Global Leaderboard</h2>
-                    <button onclick="openFullLeaderboardModal()" class="lb-view-all">View All →</button>
+        <!-- Section Header -->
+        <div class="ref-section-header">
+            <div class="rm-eyebrow reveal-up">🏆 RANKINGS</div>
+            <h2 class="section-title text-center reveal-up delay-1">Bears Leaderboard</h2>
+            <p class="section-sub text-center reveal-up delay-2">Top players win guaranteed whitelist spots every week</p>
+        </div>
+
+        <!-- BIG LEADERBOARD CARD -->
+        <div class="big-lb-card reveal-up delay-2">
+
+            <!-- Tabs -->
+            <div class="big-lb-tabs">
+                <button class="big-lb-tab active" id="inlineTabGame" onclick="switchInlineTab(0)">
+                    🎮 Game Scores
+                </button>
+                <button class="big-lb-tab" id="inlineTabReferral" onclick="switchInlineTab(1)">
+                    🔥 Referral Kings
+                </button>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="big-lb-stats" id="bigLbStats">
+                <div class="big-lb-stat">
+                    <span class="big-lb-stat-num" id="lbTotalPlayers">—</span>
+                    <span class="big-lb-stat-label">Total Players</span>
                 </div>
-                <div id="globalLeaderboardList" class="lb-list">
-                    <div class="lb-skeleton"></div>
-                    <div class="lb-skeleton"></div>
-                    <div class="lb-skeleton"></div>
-                    <div class="lb-skeleton"></div>
-                    <div class="lb-skeleton"></div>
+                <div class="big-lb-stat-divider"></div>
+                <div class="big-lb-stat">
+                    <span class="big-lb-stat-num">TOP 10</span>
+                    <span class="big-lb-stat-label">Get WL Spots</span>
+                </div>
+                <div class="big-lb-stat-divider"></div>
+                <div class="big-lb-stat">
+                    <span class="big-lb-stat-num" id="lbLastUpdated">Live</span>
+                    <span class="big-lb-stat-label">Updated</span>
                 </div>
             </div>
 
+            <!-- Top 3 Podium -->
+            <div class="big-lb-podium" id="bigLbPodium">
+                <div class="podium-skeleton"></div>
+            </div>
+
+            <!-- Full List -->
+            <div class="big-lb-list-wrap">
+                <div class="big-lb-list-header">
+                    <span class="blh-rank">RANK</span>
+                    <span class="blh-name">PLAYER</span>
+                    <span class="blh-score" id="blhScoreLabel">SCORE</span>
+                    <span class="blh-reward">REWARD</span>
+                </div>
+                <div class="big-lb-list" id="bigLbList">
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                    <div class="big-lb-skeleton"></div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="big-lb-footer">
+                <div class="big-lb-note">🎮 Play the game daily to climb ranks • Top 10 weekly = guaranteed WL spot</div>
+                <a href="https://t.me/bellybears_bot" target="_blank" class="big-lb-play-btn">
+                    Play Now →
+                </a>
+            </div>
         </div>
+
     </div>
 </section>
 
