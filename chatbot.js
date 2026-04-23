@@ -9,15 +9,15 @@
 const BB_RESPONSES = [
     {
         keywords: ['whitelist', 'wl', 'whitelisted', 'how to get wl', 'get wl'],
-        reply: `To get whitelisted, you need to complete 4 tasks + reach Top 100 in the Telegram game! 🐻\n\n1️⃣ Follow @belly_bears on X\n2️⃣ Join Telegram at t.me/bellybears_bot\n3️⃣ Share your bear on X (tag @belly_bears)\n4️⃣ Play the game & reach Top 100 Daily\n\n💡 Bonus: Repost the pinned tweet to unlock the secret Honey Vault easter egg! 46 WL spots remaining!`
+        reply: `To get whitelisted, you need to complete 4 tasks + reach Top 100 in the Telegram game! 🐻\n\n1️⃣ Follow @belly_bears on X\n2️⃣ Join Telegram at t.me/bellybears_bot\n3️⃣ Share your bear on X (tag @belly_bears)\n4️⃣ Play the game & reach Top 100 Daily\n\n💡 Bonus: Repost the pinned tweet and also refer a friend to unlock the secret Honey Vault easter egg! `
     },
     {
         keywords: ['mint price', 'price', 'cost', 'how much', 'wl price', 'public price'],
-        reply: `Here's the mint pricing breakdown 🍯\n\n🎟️ WL Mint: 0.5 ETH\n🌐 Public Mint: 0.8 ETH\n👜 Max 3 NFTs per wallet\n\nWhitelist saves you 0.3 ETH — definitely worth it! 🐻⭐`
+        reply: `Here's the mint pricing breakdown 🍯\n\n🎟️ WL Mint: x.xxx ETH\n🌐 Public Mint: x.xxx ETH\n👜 Max 3 NFTs per wallet\n\nWhitelist saves you  — definitely worth it! 🐻⭐`
     },
     {
         keywords: ['mint date', 'when mint', 'launch', 'release', 'q3', 'july'],
-        reply: `Mint is targeting Q3 2026 — aiming for July 2026! 🐻\n\nMake sure you're on the whitelist so you get early access at 0.5 ETH before the public price of 0.8 ETH. Don't sleep on it! 🍯`
+        reply: `Mint is targeting Q3 2026 — aiming for July 2026! 🐻\n\nMake sure you're on the whitelist so you get early access  before the public price of x.xxx ETH. Don't sleep on it! 🍯`
     },
     {
         keywords: ['belly pass', 'bellypass', 'power up', 'powerup', 'combo', 'shield', 'magnet'],
@@ -29,7 +29,7 @@ const BB_RESPONSES = [
     },
     {
         keywords: ['referral', 'refer', 'invite', 'friend', 'bonus', 'earn'],
-        reply: `Referrals are a great way to earn! 🐻🍯\n\nShare your referral link and when a friend mints, you BOTH get a 0.02 ETH bonus!\n\nTo get your link:\n1. Connect your wallet on the website\n2. Enter your Telegram username\n3. Share your unique referral link\n\nLet's grow the den together! 🐻`
+        reply: `Referrals are a great way to earn! 🐻🍯\n\nShare your referral link and when a friend mints, you BOTH get a bags bonus!\n\nTo get your link:\n1. Connect your wallet on the website\n2. Enter your Telegram username\n3. Share your unique referral link\n\nLet's grow the den together! 🐻`
     },
     {
         keywords: ['blockchain', 'base', 'network', 'chain', 'ethereum', 'l2', 'layer'],
@@ -69,7 +69,7 @@ const BB_RESPONSES = [
     },
     {
         keywords: ['spots', 'remaining', 'left', 'available', 'how many spots'],
-        reply: `Only 46 WL spots remaining! 🐻 Don't wait too long!\n\nComplete the 4 tasks + reach Top 100 in the Telegram game to secure your spot before they're gone. 🍯⭐`
+        reply: `Only xxx WL spots remaining! 🐻 Don't wait too long!\n\nComplete the 4 tasks + reach Top 100 in the Telegram game to secure your spot before they're gone. 🍯⭐`
     },
     {
         keywords: ['hello', 'hi', 'hey', 'sup', 'what\'s up', 'gm', 'good morning', 'yo'],
@@ -85,7 +85,7 @@ const BB_RESPONSES = [
     },
     {
         keywords: ['usdc', 'payment', 'pay', 'currency'],
-        reply: `Belly Pass is purchased with USDC on the Base network! 💰\n\nJust 2 USDC gets you 3 days of power-ups — double coins, shields, and coin magnet mode.\n\nFor NFT minting, you'll pay in ETH (0.5 ETH WL / 0.8 ETH public). 🐻`
+        reply: `Belly Pass is purchased with USDC on the Base network! 💰\n\nJust 2 USDC gets you 3 days of power-ups — double coins, shields, and coin magnet mode.\n\nFor NFT minting, you'll pay in ETH (x.xxx ETH WL / x.xxx ETH public). 🐻`
     }
 ];
 
