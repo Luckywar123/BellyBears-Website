@@ -1,67 +1,120 @@
 /* ═══════════════════════════════════════════════════════
    BELLY BEARS — CHATBOT.JS
-   NEW FILE: BellyBot — AI assistant powered by Claude
-   Uses Anthropic API (claude-sonnet-4-20250514)
-   Floating widget, bear-themed, answers project Q&A
+   BellyBot — AI-style assistant (NO external API)
+   Keyword-based response engine, bear-themed
+   Works 100% offline / client-side
 ═══════════════════════════════════════════════════════ */
 
-const CHATBOT_SYSTEM_PROMPT = `You are BellyBot 🐻, the friendly AI assistant for Belly Bears — an NFT project on the Base blockchain. You are chubby, cool, and dangerously helpful.
+// ── RESPONSE DATABASE ──────────────────────────────────
+const BB_RESPONSES = [
+    {
+        keywords: ['whitelist', 'wl', 'whitelisted', 'how to get wl', 'get wl'],
+        reply: `To get whitelisted, you need to complete 4 tasks + reach Top 100 in the Telegram game! 🐻\n\n1️⃣ Follow @belly_bears on X\n2️⃣ Join Telegram at t.me/bellybears_bot\n3️⃣ Share your bear on X (tag @belly_bears)\n4️⃣ Play the game & reach Top 100 Daily\n\n💡 Bonus: Repost the pinned tweet to unlock the secret Honey Vault easter egg! 46 WL spots remaining!`
+    },
+    {
+        keywords: ['mint price', 'price', 'cost', 'how much', 'wl price', 'public price'],
+        reply: `Here's the mint pricing breakdown 🍯\n\n🎟️ WL Mint: 0.5 ETH\n🌐 Public Mint: 0.8 ETH\n👜 Max 3 NFTs per wallet\n\nWhitelist saves you 0.3 ETH — definitely worth it! 🐻⭐`
+    },
+    {
+        keywords: ['mint date', 'when mint', 'launch', 'release', 'q3', 'july'],
+        reply: `Mint is targeting Q3 2026 — aiming for July 2026! 🐻\n\nMake sure you're on the whitelist so you get early access at 0.5 ETH before the public price of 0.8 ETH. Don't sleep on it! 🍯`
+    },
+    {
+        keywords: ['belly pass', 'bellypass', 'power up', 'powerup', 'combo', 'shield', 'magnet'],
+        reply: `Belly Pass is your in-game power-up subscription! ⚡\n\n💰 Cost: 2 USDC for 3 days\n🎮 Power-ups included:\n   • Combo Master — double coins\n   • Shield ×3 — protect your score\n   • Coin Magnet — 60 seconds of magnet mode\n\nPaid with USDC on Base network, linked to your Telegram account. 🐻`
+    },
+    {
+        keywords: ['roadmap', 'phases', 'phase', 'future', 'plans', 'next'],
+        reply: `Here's what's ahead for Belly Bears! 🗺️\n\n✅ Phase 1 (Q2 2026 — LIVE): Game, community, tasks, Belly Pass — 80% done\n🔜 Phase 2 (Q3 2026): NFT mint, holder dashboard, OpenSea\n🔮 Phase 3 (Q4 2026): NFT Staking, $BELLY rewards, airdrops, merch\n🚀 Phase 4 (Q1 2027): CEX listing, metaverse, $BELLY token\n🌍 Phase 5 (2027+): IRL events, DAO, comic & animation`
+    },
+    {
+        keywords: ['referral', 'refer', 'invite', 'friend', 'bonus', 'earn'],
+        reply: `Referrals are a great way to earn! 🐻🍯\n\nShare your referral link and when a friend mints, you BOTH get a 0.02 ETH bonus!\n\nTo get your link:\n1. Connect your wallet on the website\n2. Enter your Telegram username\n3. Share your unique referral link\n\nLet's grow the den together! 🐻`
+    },
+    {
+        keywords: ['blockchain', 'base', 'network', 'chain', 'ethereum', 'l2', 'layer'],
+        reply: `Belly Bears is on the Base blockchain! ⭐\n\nBase is Coinbase's Layer 2 on Ethereum — fast, cheap, and reliable.\n\n👜 Recommended: Coinbase Wallet (native Base support)\n✅ Also works with: MetaMask, Rabby\n\nMake sure you're on the Base network when minting! 🐻`
+    },
+    {
+        keywords: ['wallet', 'metamask', 'coinbase wallet', 'rabby', 'connect'],
+        reply: `For the best experience, use Coinbase Wallet since it has native Base support! 🐻\n\nYou can also use MetaMask or Rabby — just make sure to switch to the Base network before minting.\n\nNeed help setting up? Visit belly-bears.xyz or ask in our Telegram! 🍯`
+    },
+    {
+        keywords: ['supply', 'collection', 'how many', 'total', '2222', 'nft'],
+        reply: `Belly Bears is a collection of 2,222 hand-crafted Legendary Bears on Base blockchain! 🐻⭐\n\nEach bear is uniquely designed — no two are the same. The collection is built for long-term holders with staking, rewards, and DAO coming in later phases! 🍯`
+    },
+    {
+        keywords: ['game', 'telegram', 'telegram game', 'play', 't.me', 'bot'],
+        reply: `The Belly Bears Telegram Mini Game is LIVE now! 🎮🐻\n\n▶️ Play at: t.me/bellybears_bot\n\nReach Top 100 daily to unlock your whitelist spot!\n\nYou can also get Belly Pass (2 USDC / 3 days) for power-ups like double coins, shields, and coin magnet mode! ⚡`
+    },
+    {
+        keywords: ['twitter', 'x', 'social', 'follow', '@belly_bears'],
+        reply: `Follow us on X (Twitter) at @belly_bears for the latest news, announcements, and WL opportunities! 🐻\n\nIt's also one of the required tasks to get on the whitelist, so make sure you follow + share your bear! ⭐`
+    },
+    {
+        keywords: ['website', 'site', 'link', 'belly-bears'],
+        reply: `Our official website is belly-bears.xyz 🍯\n\nHead there to:\n• Complete WL tasks\n• Get your referral link\n• Connect your wallet\n• Track your whitelist progress\n\nSee you there, bear! 🐻`
+    },
+    {
+        keywords: ['team', 'founder', 'who made', 'developers', 'dev', 'artist'],
+        reply: `Meet the Belly Bears team! 🐻\n\n🧠 Chubby Founder — vision & leadership\n🎨 Pixel Bear — art & design\n🎮 Game Dev Bear — Telegram game\n📣 Marketing Bear — growth & community\n\nA small but mighty den of bears building something special! 🍯`
+    },
+    {
+        keywords: ['staking', 'stake', '$belly', 'token', 'rewards', 'airdrop'],
+        reply: `Staking and $BELLY token rewards are coming in Phase 3 (Q4 2026)! 🍯\n\nHolders will earn $BELLY in-game rewards, get airdrops, and access exclusive merch.\n\nThe $BELLY token goes fully live in Phase 4 (Q1 2027) with CEX listing and metaverse integration! 🐻⭐`
+    },
+    {
+        keywords: ['opensea', 'marketplace', 'secondary', 'trade', 'buy', 'sell'],
+        reply: `Belly Bears will be listed on OpenSea in Phase 2 (Q3 2026) alongside the NFT mint! ⭐\n\nAfter mint, you'll be able to trade your bears on the secondary market. Hold tight — we're almost there! 🐻🍯`
+    },
+    {
+        keywords: ['spots', 'remaining', 'left', 'available', 'how many spots'],
+        reply: `Only 46 WL spots remaining! 🐻 Don't wait too long!\n\nComplete the 4 tasks + reach Top 100 in the Telegram game to secure your spot before they're gone. 🍯⭐`
+    },
+    {
+        keywords: ['hello', 'hi', 'hey', 'sup', 'what\'s up', 'gm', 'good morning', 'yo'],
+        reply: `Hey hey! Welcome to the den! 🐻🍯\n\nI'm BellyBot, your guide to everything Belly Bears! Ask me about the whitelist, mint price, Belly Pass, roadmap, or anything else — I'm here to help! ⭐`
+    },
+    {
+        keywords: ['thanks', 'thank you', 'ty', 'thx', 'appreciate'],
+        reply: `Anytime, bear! 🐻🍯 That's what I'm here for!\n\nIf you have more questions, don't hesitate to ask. And join the Telegram at t.me/bellybears_bot to connect with the community! ⭐`
+    },
+    {
+        keywords: ['help', 'what can you do', 'commands', 'what do you know'],
+        reply: `I can answer questions about Belly Bears! 🐻 Try asking about:\n\n🎟️ Whitelist & how to get WL\n💰 Mint price & date\n⚡ Belly Pass power-ups\n🗺️ Roadmap & future phases\n🎮 The Telegram game\n👜 Wallets & Base blockchain\n💸 Referral bonuses\n\nJust ask away! 🍯`
+    },
+    {
+        keywords: ['usdc', 'payment', 'pay', 'currency'],
+        reply: `Belly Pass is purchased with USDC on the Base network! 💰\n\nJust 2 USDC gets you 3 days of power-ups — double coins, shields, and coin magnet mode.\n\nFor NFT minting, you'll pay in ETH (0.5 ETH WL / 0.8 ETH public). 🐻`
+    }
+];
 
-KEY PROJECT INFO:
-- 2222 hand-crafted Legendary Bears on Base blockchain
-- Telegram Mini Game: t.me/bellybears_bot (LIVE NOW)
-- Twitter/X: @belly_bears
-- Website: belly-bears.xyz
+// Fallback replies for unrecognized input
+const BB_FALLBACKS = [
+    "Hmm, I'm not sure about that one! 🐻 Try asking about the whitelist, mint price, Belly Pass, or roadmap — or join our Telegram at t.me/bellybears_bot for more help! 🍯",
+    "Great question, but that's beyond my honey jar! 🍯 For the latest info, check belly-bears.xyz or reach out on Telegram at t.me/bellybears_bot! 🐻",
+    "I don't have an answer for that just yet! 🐻 Ask me about the WL, mint, game, or roadmap — or hop into our Telegram community for help! ⭐"
+];
 
-WHITELIST (WL):
-- Complete 4 tasks on the website + reach Top 100 in the Telegram game
-- WL Mint price: 0.5 ETH
-- Public Mint price: 0.8 ETH  
-- Max 3 NFTs per wallet
-- Mint date: Q3 2026 (targeting July 2026)
-- 46 WL spots remaining
+let bbFallbackIndex = 0;
+let chatbotOpen     = false;
+let chatbotTyping   = false;
 
-TASKS TO GET WL:
-1. Follow @belly_bears on X
-2. Join the Telegram Community at t.me/bellybears_bot
-3. Share your bear on X (tag @belly_bears)
-4. Play Game & Reach Top 100 Daily
-5. Repost the pinned tweet (unlocks secret Honey Vault easter egg!)
+// ── RESPONSE MATCHER ──────────────────────────────────
+function getBotResponse(userText) {
+    const lower = userText.toLowerCase();
 
-BELLY PASS:
-- 2 USDC for 3 days of power-ups
-- Power-ups: Combo Master (double coins), Shield ×3, Coin Magnet (60s)
-- Paid with USDC on Base network
-- Linked to your Telegram account
+    for (const entry of BB_RESPONSES) {
+        if (entry.keywords.some(kw => lower.includes(kw))) {
+            return entry.reply;
+        }
+    }
 
-ROADMAP:
-- Phase 1 (Q2 2026, LIVE): Game, community, tasks, Belly Pass — 80% complete
-- Phase 2 (Q3 2026): NFT mint on Base, holder dashboard, OpenSea listing
-- Phase 3 (Q4 2026): NFT Staking, $BELLY in-game rewards, holder airdrops, merch
-- Phase 4 (Q1 2027): CEX listing, partnerships, metaverse integration, $BELLY token
-- Phase 5 (2027+): Global IRL events, NFT utility V2, comic & animation, DAO
-
-REFERRAL:
-- Share your referral link; when friend mints you both get 0.02 ETH bonus
-- Connect wallet + enter Telegram username to get your referral link
-
-BLOCKCHAIN:
-- Base (Coinbase's L2 on Ethereum)
-- Recommended wallet: Coinbase Wallet (native Base support)
-- Also supports MetaMask, Rabby
-
-TEAM: Chubby Founder (vision), Pixel Bear (art), Game Dev Bear (Telegram game), Marketing Bear (growth)
-
-RESPONSE STYLE:
-- Keep answers SHORT and friendly (2-4 sentences max)
-- Use bear emojis occasionally 🐻🍯⭐
-- Be enthusiastic about the project but honest
-- If unsure about something, say so and direct to Telegram/Twitter
-- Never make up prices, dates, or facts not listed above`;
-
-let chatHistory = [];
-let chatbotOpen = false;
-let chatbotTyping = false;
+    // Rotate through fallbacks
+    const fallback = BB_FALLBACKS[bbFallbackIndex % BB_FALLBACKS.length];
+    bbFallbackIndex++;
+    return fallback;
+}
 
 // ── INIT ──────────────────────────────────────────────
 function initChatbot() {
@@ -69,7 +122,6 @@ function initChatbot() {
     injectChatbotCSS();
     bindChatbotEvents();
 
-    // Welcome message after brief delay
     setTimeout(() => {
         addBotMessage("Hey there! I'm BellyBot 🐻 — your guide to the Belly Bears universe. Ask me anything about the NFT, whitelist, game, or Belly Pass! 🍯");
     }, 500);
@@ -78,10 +130,6 @@ function initChatbot() {
 // ── HTML INJECTION ────────────────────────────────────
 function injectChatbotHTML() {
     const html = `
-    <!-- ═══════════════════════════════════════════════
-         BELLYBOT CHATBOT WIDGET
-         NEW: AI-powered Q&A assistant
-    ═══════════════════════════════════════════════ -->
     <div id="bellyBotWidget">
 
         <!-- Toggle button -->
@@ -101,7 +149,7 @@ function injectChatbotHTML() {
                         <div class="bb-name">BellyBot</div>
                         <div class="bb-status">
                             <span class="bb-status-dot"></span>
-                            Online · Powered by Claude AI
+                            Online · Belly Bears Assistant
                         </div>
                     </div>
                 </div>
@@ -218,9 +266,7 @@ function injectChatbotCSS() {
     animation: bbWindowIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
     transform-origin: bottom left;
 }
-#bellyBotWindow.hidden {
-    display: none;
-}
+#bellyBotWindow.hidden { display: none; }
 @keyframes bbWindowIn {
     from { transform: scale(0.85) translateY(20px); opacity: 0; }
     to   { transform: none; opacity: 1; }
@@ -316,6 +362,7 @@ function injectChatbotCSS() {
     font-size: 0.83rem;
     line-height: 1.55;
     word-wrap: break-word;
+    white-space: pre-line;
 }
 .bb-msg.bot .bb-bubble {
     background: rgba(255,255,255,0.06);
@@ -442,13 +489,6 @@ function injectChatbotCSS() {
 .bb-send:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(245,158,11,0.6); }
 .bb-send:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-/* Error message style */
-.bb-bubble.bb-error {
-    background: rgba(239,68,68,0.1);
-    border-color: rgba(239,68,68,0.2);
-    color: #fca5a5;
-}
-
 /* Mobile adjustments */
 @media (max-width: 480px) {
     #bellyBotWidget { left: 12px; bottom: 80px; }
@@ -461,7 +501,6 @@ function injectChatbotCSS() {
 
 // ── EVENT BINDINGS ─────────────────────────────────────
 function bindChatbotEvents() {
-    // Close on Escape
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && chatbotOpen) toggleChatbot();
     });
@@ -493,23 +532,48 @@ function toggleChatbot() {
 }
 
 // ── SEND MESSAGE ──────────────────────────────────────
-async function sendChatMessage() {
+function sendChatMessage() {
     const input = document.getElementById('bbInput');
     const text  = input.value.trim();
     if (!text || chatbotTyping) return;
 
     input.value = '';
     addUserMessage(text);
-    await getBotReply(text);
+    simulateBotReply(text);
 }
 
 function sendQuickReply(text) {
     if (chatbotTyping) return;
-    // Hide quick replies after first use
     const qr = document.getElementById('bbQuickReplies');
     if (qr) qr.style.display = 'none';
     addUserMessage(text);
-    getBotReply(text);
+    simulateBotReply(text);
+}
+
+// ── SIMULATE TYPING + REPLY ────────────────────────────
+function simulateBotReply(userText) {
+    chatbotTyping = true;
+    const sendBtn = document.querySelector('.bb-send');
+    const input   = document.getElementById('bbInput');
+    if (sendBtn) sendBtn.disabled = true;
+    if (input)   input.disabled  = true;
+
+    showTyping();
+
+    // Simulate realistic typing delay (600–1200ms)
+    const delay = 600 + Math.random() * 600;
+    setTimeout(() => {
+        hideTyping();
+        const reply = getBotResponse(userText);
+        addBotMessage(reply);
+
+        chatbotTyping = false;
+        if (sendBtn) sendBtn.disabled = false;
+        if (input) {
+            input.disabled = false;
+            input.focus();
+        }
+    }, delay);
 }
 
 // ── ADD USER MESSAGE ───────────────────────────────────
@@ -524,24 +588,22 @@ function addUserMessage(text) {
     `;
     container.appendChild(div);
     scrollToBottom();
-    chatHistory.push({ role: 'user', content: text });
 }
 
 // ── ADD BOT MESSAGE ────────────────────────────────────
-function addBotMessage(text, isError = false) {
+function addBotMessage(text) {
     const container = document.getElementById('bbMessages');
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const div = document.createElement('div');
     div.className = 'bb-msg bot';
     div.innerHTML = `
         <div class="bb-msg-avatar">🐻</div>
-        <div class="bb-bubble${isError ? ' bb-error' : ''}">${text}</div>
+        <div class="bb-bubble">${escapeHTML(text)}</div>
         <span class="bb-msg-time">${time}</span>
     `;
     container.appendChild(div);
     scrollToBottom();
 
-    // Show badge if chat closed
     if (!chatbotOpen) {
         const badge = document.getElementById('bbBadge');
         if (badge) badge.classList.remove('hidden');
@@ -574,57 +636,6 @@ function hideTyping() {
 function scrollToBottom() {
     const container = document.getElementById('bbMessages');
     if (container) container.scrollTop = container.scrollHeight;
-}
-
-// ── GET BOT REPLY FROM CLAUDE API ─────────────────────
-async function getBotReply(userText) {
-    chatbotTyping = true;
-    const sendBtn = document.querySelector('.bb-send');
-    const input   = document.getElementById('bbInput');
-    if (sendBtn) sendBtn.disabled = true;
-    if (input)   input.disabled  = true;
-
-    showTyping();
-
-    try {
-        // Keep last 10 messages for context (5 exchanges)
-        const recentHistory = chatHistory.slice(-10);
-
-        const response = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: 'claude-sonnet-4-20250514',
-                max_tokens: 300,
-                system: CHATBOT_SYSTEM_PROMPT,
-                messages: recentHistory
-            })
-        });
-
-        if (!response.ok) throw new Error(`API error: ${response.status}`);
-
-        const data = await response.json();
-        const reply = data.content?.[0]?.text || "Hmm, something went wrong. Try asking again! 🐻";
-
-        hideTyping();
-        addBotMessage(reply);
-        chatHistory.push({ role: 'assistant', content: reply });
-
-    } catch (err) {
-        console.error('BellyBot API error:', err);
-        hideTyping();
-        addBotMessage(
-            err.message.includes('401') || err.message.includes('403')
-                ? "Oops! Bot setup issue. Join our <a href='https://t.me/bellybears_bot' target='_blank' style='color:#f59e0b;'>Telegram</a> for help! 🐻"
-                : "Sorry, I'm taking a honey break 🍯 Try again in a moment, or join our <a href='https://t.me/bellybears_bot' target='_blank' style='color:#f59e0b;'>Telegram</a>!",
-            false
-        );
-    } finally {
-        chatbotTyping = false;
-        if (sendBtn) sendBtn.disabled = false;
-        if (input)   input.disabled  = false;
-        input?.focus();
-    }
 }
 
 // ── HELPERS ────────────────────────────────────────────

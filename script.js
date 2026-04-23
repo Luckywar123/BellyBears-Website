@@ -517,7 +517,7 @@ async function loadInlineLeaderboardData(tab) {
                 const heights   = ['podium-h-2nd', 'podium-h-1st', 'podium-h-3rd'];
                 const name      = escapeHtml(p.display_name || p.telegram_username || 'Bear').slice(0, 14);
                 const refs      = p.referral_count || 0;
-                const reward    = (refs * 0.02).toFixed(3);
+                
                 return `
                 <div class="podium-player ${podiumPositions[i]}">
                     <div class="podium-avatar">${medals[origRank - 1]}</div>
@@ -540,7 +540,7 @@ async function loadInlineLeaderboardData(tab) {
                 const name   = escapeHtml(p.display_name || p.telegram_username || 'Anonymous Bear');
                 const refs   = p.referral_count || 0;
                 const coins  = p.bonus_coins || 0;
-                const reward = (refs * 0.02).toFixed(3);
+                
                 return `
                 <div class="big-lb-row" style="animation-delay:${i * 0.035}s">
                     <div class="blr-rank">#${rank}</div>
@@ -549,7 +549,6 @@ async function loadInlineLeaderboardData(tab) {
                         <span class="blr-sub">${coins} coins</span>
                     </div>
                     <div class="blr-score">${refs} ref${refs !== 1 ? 's' : ''}</div>
-                    <div class="blr-reward"><span class="blr-eth">+${reward} ETH</span></div>
                 </div>`;
             }).join('');
         }
@@ -616,7 +615,7 @@ async function fetchLeaderboardData(tab) {
                 const rankDisplay = medals[rank] || rank;
                 const topClass = rank <= 3 ? `top-${rank}` : '';
                 const name = escapeHtml(p.display_name || p.telegram_username || 'Bear');
-                const reward = ((p.referral_count || 0) * 0.02).toFixed(3);
+                
                 const coins  = p.bonus_coins || 0;
                 html += `
                 <div class="lb-row-card ${topClass}" style="animation-delay:${i * 0.04}s">
@@ -625,7 +624,7 @@ async function fetchLeaderboardData(tab) {
                         ${name}
                         <span class="lb-card-sub">${p.referral_count || 0} referral${(p.referral_count || 0) !== 1 ? 's' : ''} · ${coins} coins</span>
                     </div>
-                    <div class="lb-card-reward">+${reward} ETH</div>
+                    
                 </div>`;
             });
             container.innerHTML = html;
